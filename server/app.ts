@@ -7,7 +7,11 @@ import { planRouter } from './routes/plan.js';
 
 export function createApp(store: MealWiseStore) {
 	const app = express();
+	const isProduction = process.env.NODE_ENV === 'production';
 	const allowedOrigins = (process.env.CORS_ORIGIN || '').split(',').map((origin) => origin.trim()).filter(Boolean);
+	if (isProduction && !allowedOrigins.length) {
+		throw new Error('CORS_ORIGIN must be configured in production.');
+	}
 
 	app.use(cors({
 		origin: allowedOrigins.length ? (origin, callback) => {

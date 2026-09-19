@@ -1,14 +1,14 @@
-import { readFileSync } from 'node:fs';
-import { quoteSchema, type Quote } from '../../shared/quotes.js';
 import { randomUUID } from 'node:crypto';
 import { MongoClient, type Collection } from 'mongodb';
 import type { ChatRequest, PlanResponse } from '../../shared/schemas.js';
+import { conversationContextSchema, type ConversationContext } from '../../shared/intent.js';
 
 type StoredPlan = {
   _id?: string;
   conversationId: string;
   request: ChatRequest;
   response: PlanResponse;
+  context?: ConversationContext;
   createdAt: Date;
 };
 
@@ -21,8 +21,8 @@ type StoredMessage = {
 };
 
 export interface MealWiseStore {
-  saveConversationTurn(conversationId: string, request: ChatRequest, reply: string, plan: PlanResponse): Promise<void>;
-  listQuotes(): Promise<Quote[]>;
+  getConversationContext(conversationId: string): Promise<ConversationContext | null>;
+  saveConversationTurn(conversationId: string, request: ChatRequest, reply: string, plan: PlanResponse, context?: ConversationContext): Promise<void>;
   close(): Promise<void>;
 }
 
@@ -30,15 +30,19 @@ class MemoryStore implements MealWiseStore {
   private readonly messages: StoredMessage[] = [];
   private readonly plans: StoredPlan[] = [];
 
-  async saveConversationTurn(conversationId: string, request: ChatRequest, reply: string, plan: PlanResponse) {
+  async getConversationContext(conversationId: string) {
+    const saved = this.plans.filter((plan) => plan.conversationId === conversationId).at(-1);
+    return saved?.context ? structuredClone(saved.context) : null;
+  }
+
+  async saveConversationTurn(conversationId: string, request: ChatRequest, reply: string, plan: PlanResponse, context?: ConversationContext) {
     const createdAt = new Date();
     this.messages.push({ _id: randomUUID(), conversationId, role: 'user', content: request.message, createdAt });
     this.messages.push({ _id: randomUUID(), conversationId, role: 'assistant', content: reply, createdAt });
-    this.plans.push({ _id: randomUUID(), conversationId, request, response: plan, createdAt });
-  }
-
-  async listQuotes() {
-    return ['quotes.json', 'ubereats-menu-mountain-view.json', 'three-platform-demo.json', 'bogo-demo-quotes.json'].flatMap(file => quoteSchema.array().parse(JSON.parse(readFileSync(new URL(`../data/${file}`, import.meta.url), 'utf8'))));
+    this.plans.push({ _id: randomUUID(), conversationId, request, response: plan, context, createdAt });
+    // The development store is intentionally disposable and bounded.
+    if (this.plans.length > 1000) this.plans.splice(0, this.plans.length - 1000);
+    if (this.messages.length > 2000) this.messages.splice(0, this.messages.length - 2000);
   }
 
   async close() {}
@@ -48,22 +52,22 @@ class MongoStore implements MealWiseStore {
   constructor(
     private readonly client: MongoClient,
     private readonly messages: Collection<StoredMessage>,
-    private readonly plans: Collection<StoredPlan>,
-    private readonly quotes: Collection
+    private readonly plans: Collection<StoredPlan>
   ) {}
 
-  async saveConversationTurn(conversationId: string, request: ChatRequest, reply: string, plan: PlanResponse) {
+  async getConversationContext(conversationId: string) {
+    const saved = await this.plans.findOne({ conversationId }, { sort: { createdAt: -1, _id: -1 } });
+    const parsed = conversationContextSchema.safeParse(saved?.context);
+    return parsed.success ? parsed.data : null;
+  }
+
+  async saveConversationTurn(conversationId: string, request: ChatRequest, reply: string, plan: PlanResponse, context?: ConversationContext) {
     const createdAt = new Date();
     await this.messages.insertMany([
       { conversationId, role: 'user', content: request.message, createdAt },
       { conversationId, role: 'assistant', content: reply, createdAt }
     ]);
-    await this.plans.insertOne({ conversationId, request, response: plan, createdAt });
-  }
-
-  async listQuotes() {
-    const documents = await this.quotes.find({}).limit(1000).toArray();
-    return quoteSchema.array().parse(documents);
+    await this.plans.insertOne({ conversationId, request, response: plan, context, createdAt });
   }
 
   async close() {
@@ -87,7 +91,5 @@ export async function createStore(uri = process.env.MONGODB_URI, databaseName = 
     messages.createIndex({ conversationId: 1, createdAt: 1 }),
     plans.createIndex({ conversationId: 1, createdAt: -1 })
   ]);
-  const quotes = database.collection('quotes');
-  await quotes.createIndex({ comparison_key: 1, platform: 1, captured_at: -1 });
-  return new MongoStore(client, messages, plans, quotes);
+  return new MongoStore(client, messages, plans);
 }

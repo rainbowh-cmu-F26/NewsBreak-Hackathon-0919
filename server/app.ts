@@ -1,3 +1,4 @@
+import './env.js';
 import cors from 'cors';
 import express from 'express';
 import type { MealWiseStore } from './db/mongo.js';
@@ -5,8 +6,30 @@ import { createStore } from './db/mongo.js';
 import { rateLimit, securityHeaders } from './middleware/security.js';
 import { createChatRouter } from './routes/chat.js';
 import { createPlanRouter } from './routes/plan.js';
+import { FoodAgent } from './agent/foodAgent.js';
+import { buildPlan } from './agent/localAgent.js';
 
-export function createApp(store: MealWiseStore) {
+type AppAgent = Pick<FoodAgent, 'run' | 'dataSource'>;
+
+export function createApp(store: MealWiseStore, agent?: AppAgent) {
+	const legacyStore = store as MealWiseStore & { listQuotes?: () => Promise<unknown[]>; getConversationContext?: (conversationId: string) => Promise<unknown>; };
+	const resolvedStore: MealWiseStore = typeof legacyStore.getConversationContext === 'function'
+		? store
+		: {
+			getConversationContext: async () => null,
+			saveConversationTurn: store.saveConversationTurn.bind(store),
+			close: store.close.bind(store)
+		};
+	const resolvedAgent: AppAgent = agent ?? (typeof legacyStore.listQuotes === 'function'
+		? {
+			dataSource: 'verified-demo-data',
+			run: async (request) => {
+				const quotes = await legacyStore.listQuotes?.();
+				const plan = buildPlan({ prompt: request.message, budget: request.budget, dietary: request.dietary }, Array.isArray(quotes) ? quotes : undefined);
+				return { reply: plan.summary, plan, context: null };
+			}
+		}
+		: new FoodAgent());
 	const app = express();
 	const isProduction = process.env.NODE_ENV === 'production';
 	const allowedOrigins = (process.env.CORS_ORIGIN || '').split(',').map((origin) => origin.trim()).filter(Boolean);
@@ -27,9 +50,9 @@ export function createApp(store: MealWiseStore) {
 		response.setHeader('Cache-Control', 'no-store');
 		next();
 	});
-	app.get('/health', (_request, response) => response.json({ ok: true, service: 'mealwise-api', dataSource: 'quote-snapshots' }));
-	app.use('/api/plan', createPlanRouter(store));
-	app.use('/api/chat', createChatRouter(store));
+	app.get('/health', (_request, response) => response.json({ ok: true, service: 'mealwise-api', dataSource: resolvedAgent.dataSource }));
+	app.use('/api/plan', createPlanRouter(resolvedAgent));
+	app.use('/api/chat', createChatRouter(resolvedStore, resolvedAgent));
 	app.use((_request, response) => response.status(404).json({ error: 'Route not found.' }));
 	app.use((error: unknown, _request: express.Request, response: express.Response, _next: express.NextFunction) => {
 		if (error instanceof SyntaxError && 'status' in error && error.status === 400) {
@@ -47,7 +70,13 @@ export function createApp(store: MealWiseStore) {
 const port = Number(process.env.PORT || 8787);
 if (process.env.NODE_ENV !== 'test') {
 	createStore().then((store) => {
-		createApp(store).listen(port, () => console.log(`MealWise API listening on ${port}`));
+		const server = createApp(store).listen(port, () => console.log(`MealWise API listening on ${port}`));
+		server.once('error', (error: NodeJS.ErrnoException) => {
+			console.error(error.code === 'EADDRINUSE'
+				? `Port ${port} is already in use. Stop the other MealWise dev server before running npm run dev again.`
+				: `Unable to start MealWise: ${error.message}`);
+			void store.close().finally(() => { process.exitCode = 1; });
+		});
 	}).catch((error) => {
 		console.error('Unable to initialize MealWise persistence:', error);
 		process.exitCode = 1;

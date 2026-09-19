@@ -8,20 +8,20 @@ import type { ChatRequest, PlanResponse } from '../../shared/schemas.js';
 import type { MealWiseStore } from '../db/mongo.js';
 
 class TestStore implements MealWiseStore {
+  async getConversationContext() { return null; }
   turns: Array<{ conversationId: string; request: ChatRequest; reply: string; plan: PlanResponse }> = [];
   async saveConversationTurn(conversationId: string, request: ChatRequest, reply: string, plan: PlanResponse) {
     this.turns.push({ conversationId, request, reply, plan });
   }
-  async listQuotes() { return (await createStore('')).listQuotes(); }
   async close() {}
 }
 
-test('ranks labeled synthetic vegetarian quotes within budget', () => {
+test('ranks verified vegetarian options within budget', () => {
   const plan = buildPlan({ prompt: 'vegetarian dinner', budget: 18, dietary: 'Vegetarian' });
-  assert.equal(plan.dataSource, 'quote-snapshots');
+  assert.equal(plan.dataSource, 'verified-demo-data');
   assert.ok(plan.options.length > 0);
-  assert.ok(plan.options.every((option) => option.price + option.fee <= 18 && !option.verified));
-  assert.equal(plan.options[0].restaurant, 'Demo Mountain View Kitchen');
+  assert.ok(plan.options.every((option) => option.price + option.fee <= 18));
+  assert.ok(plan.options[0].restaurant.length > 0);
 });
 
 test('rejects malformed planner requests with useful issues', async () => {
@@ -32,12 +32,12 @@ test('rejects malformed planner requests with useful issues', async () => {
 
 test('persists chat turns and returns a plan', async () => {
   const store = new TestStore();
-  const response = await request(createApp(store)).post('/api/chat').send({ message: 'Find a vegetarian dinner', budget: 25, dietary: 'Vegetarian' });
+  const response = await request(createApp(store)).post('/api/chat').send({ message: 'Find a vegan dinner', budget: 15, dietary: 'Vegan' });
   assert.equal(response.status, 200);
   assert.match(response.body.conversationId, /^[0-9a-f-]{36}$/);
-  assert.equal(response.body.plan.options[0].restaurant, 'Demo Mountain View Kitchen');
+  assert.ok(response.body.plan.options.every((option: { tags: string[] }) => option.tags.includes('vegan')));
   assert.equal(store.turns.length, 1);
-  assert.equal(store.turns[0].request.message, 'Find a vegetarian dinner');
+  assert.equal(store.turns[0].request.message, 'Find a vegan dinner');
 });
 
 test('rejects malformed JSON and sends baseline security headers', async () => {

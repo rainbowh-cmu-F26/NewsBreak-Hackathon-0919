@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { agentDetailsSchema, providerValues } from './intent.js';
 import { sourceOfferSchema } from './quotes.js';
 
 export const planRequestSchema = z.object({
@@ -29,6 +30,15 @@ export const deliveryOptionSchema = z.object({
   sourceUrl: z.string().nullable().optional(),
   comparisons: z.array(z.object({ platform: z.string(), subtotal: z.number(), delivery: z.number(), service: z.number(), tax: z.number(), tip: z.number(), discount: z.number(), total: z.number(), eta: z.string() })).optional(),
   quote: z.object({ platform: z.string(), dataType: z.string(), capturedAt: z.string().nullable(), subtotal: z.number().nullable(), delivery: z.number().nullable(), service: z.number().nullable(), tax: z.number().nullable(), combined: z.number().nullable(), other: z.array(z.object({ name: z.string(), amount_cents: z.number() })), tip: z.number().nullable(), discount: z.number().nullable() }).optional(),
+  provider: z.enum(providerValues).optional(),
+  cuisine: z.string().optional(),
+  servings: z.number().int().positive().optional(),
+  quantity: z.number().int().positive().optional(),
+  total: z.number().nonnegative().optional(),
+  tax: z.number().nonnegative().optional(),
+  serviceFee: z.number().nonnegative().optional(),
+  savings: z.number().nonnegative().optional(),
+  priceNote: z.string().optional(),
 });
 
 export type DeliveryOption = z.infer<typeof deliveryOptionSchema>;
@@ -37,7 +47,8 @@ export const planResponseSchema = z.object({
   options: z.array(deliveryOptionSchema),
   savings: z.number().nonnegative(),
   checkedAt: z.string().datetime(),
-  dataSource: z.enum(['verified-demo-data', 'quote-snapshots'])
+  dataSource: z.enum(['verified-demo-data', 'quote-snapshots', 'provider-data']),
+  agent: agentDetailsSchema.optional(),
 });
 export type PlanResponse = z.infer<typeof planResponseSchema>;
 

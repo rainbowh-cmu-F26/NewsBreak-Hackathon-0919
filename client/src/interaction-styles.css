@@ -31,3 +31,5 @@
 
 .price-methodology { margin: 16px 0; color: #536b65; font-size: 14px; }
 .price-methodology summary { cursor: pointer; padding: 8px 0; font-weight: 600; }
+
+.agent-filters{border:1px solid var(--line);padding:18px;margin:22px 0;background:#fffdf8}.agent-filters-heading{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:13px}.agent-filters-heading span{font-size:11px;color:#55706d}.agent-filters ul{display:flex;flex-wrap:wrap;gap:7px;list-style:none;padding:0;margin:13px 0}.agent-filters li{background:#e7efdf;padding:6px 9px;font-size:12px}.agent-warning,.agent-hint{font-size:12px;line-height:1.5;color:#55706d;margin:7px 0}.agent-question{font-size:14px;font-weight:600}.offer-source{font-size:10px;color:#55706d;margin:7px 0}.chat-form input{min-width:0}.was-price{text-decoration:none}

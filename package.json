@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "workspaces": ["client", "server"],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
+    "dev": "concurrently --kill-others-on-fail \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
     "build": "npm run build --workspace client",
     "start": "npm run start --workspace server",
     "install:all": "npm install --workspaces"

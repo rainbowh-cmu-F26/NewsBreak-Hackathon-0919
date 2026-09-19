@@ -25,6 +25,7 @@ MealWise helps low-income residents in Mountain View find the most cost-effectiv
 - Validate incoming API payloads with Zod before running ranking logic.
 - Keep recommendation ranking deterministic and explainable: budget and dietary fit first, then verified savings and total cost.
 - Treat `server/data/demo-data.json` as verified demo data only. New real providers should be isolated behind tools and verification logic.
+- Validate demo/provider offers before ranking them; preserve source and verification timestamps in API responses.
 - Keep API responses compatible with the shared schemas. The planner endpoint is `POST /api/plan`.
 - Do not expose secrets in source code. Use `.env.example` for documented environment variables.
 
@@ -43,4 +44,4 @@ For API changes, also start the server and smoke-test `POST /api/plan` with a re
 - The client is built from the repository root into `client/dist` and can be deployed to a static host.
 - The server runs with `npm run start --workspace server` and can be deployed to a Node-compatible host.
 - Configure `VITE_API_URL` for the deployed client and `PORT` for the server.
-- Before production, replace permissive development CORS with an allowlist for the deployed client origin.
+- Configure `CORS_ORIGIN` with the deployed client origin. The unset development fallback is permissive and must not be used in production.

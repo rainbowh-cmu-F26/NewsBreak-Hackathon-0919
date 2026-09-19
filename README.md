@@ -15,7 +15,7 @@ MealWise is a delivery savings agent for low-income residents in Mountain View. 
 │   ├── package.json
 │   └── vite.config.ts
 ├── server/                 # Express API and local agent logic
-│   ├── agent/              # Prompt, schemas, and ranking agent
+│   ├── agent/              # Prompt, ranking agent, and offer verification
 │   ├── data/               # Verified demo offers
 │   ├── routes/             # HTTP endpoints
 │   ├── app.ts
@@ -53,6 +53,10 @@ npm run build
 
 ## API
 
+`GET /health`
+
+Returns API availability and the active data source. The current response identifies `verified-demo-data` so the interface does not imply live provider integrations.
+
 `POST /api/plan`
 
 ```json
@@ -63,7 +67,9 @@ npm run build
 }
 ```
 
-The response contains a ranked `options` list, total `savings`, a plain-language `summary`, and a `checkedAt` timestamp. The current agent uses verified demo data so the hackathon experience is deterministic. The `MODEL_API_KEY` placeholder in `.env.example` is ready for replacing the local ranking step with a hosted model after real provider tools are connected.
+The response contains a ranked `options` list, total `savings`, a plain-language `summary`, a `checkedAt` timestamp, and `dataSource`. Each option includes its total price inputs, ETA, promotion detail, verification status, source, and verification timestamp. Requests are rejected with a useful `400` response when the craving, budget, or dietary preference is invalid.
+
+The current agent is deterministic and uses only schema-verified demo data. Ranking prioritizes dietary fit, prompt relevance, verified savings, and total cost. The `MODEL_API_KEY` placeholder in `.env.example` is ready for replacing the local ranking step with a hosted model after real provider tools are connected; provider results must still pass verification before ranking.
 
 ## Deployment
 
@@ -71,43 +77,7 @@ Deploy the client and server as two services for the cleanest scaling path:
 
 1. Build the client with `npm run build` from the repository root and deploy `client/dist` to Vercel, Netlify, or any static host.
 2. Deploy the server workspace to Render, Railway, Fly.io, or a Node-compatible host using `npm run start --workspace server`.
-3. Set `VITE_API_URL` on the client to the public server URL and `PORT` on the server if the host requires it.
-4. Allow the deployed client origin in the Express CORS configuration before production launch.
+3. Set `VITE_API_URL` on the client to the public server URL, `PORT` on the server if the host requires it, and `CORS_ORIGIN` to the deployed client origin.
+4. Do not leave `CORS_ORIGIN` unset in production; the development fallback allows all origins for local demos.
 
 For a hackathon demo, Vercel can host the static client and Render can host the Express API with the included workspace commands.
-# NewsBreak-Hackathon-0919
-
-We are organizing a four-hour hackathon. You can see the event theme in the "Define NewsBreak hackathon agent" box. We want to focus on designing an AI agent specifically tailored to help low-income residents in Mountain View use delivery services. We are focusing solely on delivery. The goal is to identify the most cost-effective options—for instance, finding "buy-one-get-one-free" offers.
-
-```
-Project/
-├── client/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── api/
-│   │   └── types/
-│   └── package.json
-├── server/
-│   ├── agent/
-│   │   ├── localAgent.js
-│   │   ├── instructions.js
-│   │   └── schemas.js
-│   ├── tools/
-│   │   ├── food.js
-│   │   ├── delivery.js
-│   │   ├── disruptions.js
-│   │   └── verification.js
-│   ├── data/
-│   │   └── demo-data.json
-│   ├── routes/
-│   │   └── plan.js
-│   └── app.js
-├── shared/
-│   └── schemas.js
-├── .devcontainer/
-│   └── devcontainer.json
-├── .env.example
-├── package.json
-└── README.md
-```

@@ -124,3 +124,40 @@ Deploy the client and server as two services for the cleanest scaling path:
 5. Do not leave `CORS_ORIGIN` or `MONGODB_URI` unset in production; their development fallbacks are intended only for local demos.
 
 For a hackathon demo, Vercel can host the static client and Render can host the Express API with the included workspace commands.
+
+## MongoDB quote snapshots
+
+Both `/api/plan` and `/api/chat` now read the `quotes` collection. There are no basket collections. The validated document contract is `shared/quotes.ts`; an importable JSON array is `server/data/quotes.json`. The supplied two records are explicitly synthetic, not real restaurant prices. Without MONGODB_URI, development uses this file. With MongoDB configured, an empty collection returns no results (no silent demo fallback).
+
+Set MONGODB_URI and MONGODB_DATABASE in the **server process environment**, then run:
+
+```sh
+npm run seed:quotes --workspace server
+npm run dev
+```
+
+To import your own JSON array:
+
+```sh
+npm run seed:quotes --workspace server -- /absolute/path/quotes.json
+```
+
+These commands read environment variables; they do not automatically load `.env`. Do not commit credentials. The importer validates before writing and upserts matching snapshot identities without deleting other records. It converts captured_at strings into BSON dates. Real checkout snapshots need captured_at and evidence_paths; amounts are integer cents, unknowns null. Set verification_status to verified only after checking evidence. Applied offers must have confirmed eligibility to appear. Dietary tags must be supported by evidence.
+
+The UI shows recorded totals, fee details, account/location conditions, and data provenance. This version lists snapshots under the requested budget; it does not infer membership eligibility or claim a universally cheapest cross-platform order. Session-specific address and membership filtering are not yet implemented. The backend does not expose private account IDs or screenshot paths to the browser. No live platform collection or payment is performed.
+
+
+## Fifteen-restaurant comparison demo
+
+The UI defaults to simulation mode. Choose **Compare all 15**, a $35 budget and **No preference** to see 15 distinct restaurants, each with Uber Eats, DoorDash and hypothetical restaurant delivery. Each card highlights the lowest simulated total and expands to show all fee breakdowns. Four restaurant scenarios reference collected public menu prices; eleven are explicitly fictional. No simulated quote proves real platform or restaurant delivery availability.
+
+Import the additional datasets after configuring the server environment:
+
+```sh
+npm run seed:quotes --workspace server -- ../server/data/ubereats-menu-mountain-view.json
+npm run seed:quotes --workspace server -- ../server/data/three-platform-demo.json
+```
+
+The 40 menu-only records remain separate from 45 synthetic platform quotes. Development without MongoDB loads all three JSON files. Search modes are `menu`, `simulation`, and `checkout`; the UI search and chat explicitly request simulation. Menu-only data never becomes a verified checkout quote. Restaurant matching is keyword-based, not a hosted language model. Budget filtering uses the winning total; comparison rows may also show alternatives above that budget.
+
+Validation: `npm test --workspace server`, `npm run build`, and `npx tsc --noEmit -p server/tsconfig.json`.

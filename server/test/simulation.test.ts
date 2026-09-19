@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import {readFileSync} from 'node:fs';
+import {quoteSchema} from '../../shared/quotes.js';
+import {buildPlan} from '../agent/localAgent.js';
+const rows=quoteSchema.array().parse(JSON.parse(readFileSync(new URL('../data/ubereats-menu-mountain-view.json',import.meta.url),'utf8')));
+test('simulation uses sourced item price, computes total and preserves source',()=>{
+ const before=JSON.stringify(rows);
+ const plan=buildPlan({prompt:'Bowl',budget:20,dietary:'No preference',mode:'simulation'},rows);
+ const bowl=plan.options.find(o=>o.item.includes('× Bowl'))!;
+ assert.ok(bowl);
+ assert.equal(bowl.price,18.56);
+ assert.equal(bowl.quote?.subtotal,1165);
+ assert.equal(bowl.quote?.service,175);
+ assert.equal(bowl.quote?.tax,117);
+ assert.equal(bowl.quote?.tip,200);
+ assert.equal(bowl.quote?.dataType,'synthetic');
+ assert.equal(bowl.verified,false);
+ assert.equal(JSON.stringify(rows),before);
+ assert.ok(!buildPlan({prompt:'Bowl',budget:18,dietary:'No preference',mode:'simulation'},rows).options.some(o=>o.item.includes('× Bowl')));
+});

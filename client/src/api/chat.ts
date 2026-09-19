@@ -4,7 +4,7 @@ export async function sendChatMessage(request: ChatRequest): Promise<ChatRespons
   const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8787'}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(request)
+    body: JSON.stringify({ ...request, mode: 'simulation' })
   });
   if (!response.ok) throw new Error('The agent could not answer right now. Please try again.');
   return response.json() as Promise<ChatResponse>;

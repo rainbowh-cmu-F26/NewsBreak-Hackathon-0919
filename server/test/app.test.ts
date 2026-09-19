@@ -12,15 +12,16 @@ class TestStore implements MealWiseStore {
   async saveConversationTurn(conversationId: string, request: ChatRequest, reply: string, plan: PlanResponse) {
     this.turns.push({ conversationId, request, reply, plan });
   }
+  async listQuotes() { return (await createStore('')).listQuotes(); }
   async close() {}
 }
 
-test('ranks verified vegetarian options within budget', () => {
+test('ranks labeled synthetic vegetarian quotes within budget', () => {
   const plan = buildPlan({ prompt: 'vegetarian dinner', budget: 18, dietary: 'Vegetarian' });
-  assert.equal(plan.dataSource, 'verified-demo-data');
+  assert.equal(plan.dataSource, 'quote-snapshots');
   assert.ok(plan.options.length > 0);
-  assert.ok(plan.options.every((option) => option.price + option.fee <= 18 && option.verified));
-  assert.equal(plan.options[0].restaurant, 'Little Hunan');
+  assert.ok(plan.options.every((option) => option.price + option.fee <= 18 && !option.verified));
+  assert.equal(plan.options[0].restaurant, 'Demo Mountain View Kitchen');
 });
 
 test('rejects malformed planner requests with useful issues', async () => {
@@ -31,12 +32,12 @@ test('rejects malformed planner requests with useful issues', async () => {
 
 test('persists chat turns and returns a plan', async () => {
   const store = new TestStore();
-  const response = await request(createApp(store)).post('/api/chat').send({ message: 'Find a vegan dinner', budget: 15, dietary: 'Vegan' });
+  const response = await request(createApp(store)).post('/api/chat').send({ message: 'Find a vegetarian dinner', budget: 25, dietary: 'Vegetarian' });
   assert.equal(response.status, 200);
   assert.match(response.body.conversationId, /^[0-9a-f-]{36}$/);
-  assert.equal(response.body.plan.options[0].restaurant, 'Green Garden');
+  assert.equal(response.body.plan.options[0].restaurant, 'Demo Mountain View Kitchen');
   assert.equal(store.turns.length, 1);
-  assert.equal(store.turns[0].request.message, 'Find a vegan dinner');
+  assert.equal(store.turns[0].request.message, 'Find a vegetarian dinner');
 });
 
 test('rejects malformed JSON and sends baseline security headers', async () => {

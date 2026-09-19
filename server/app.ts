@@ -4,7 +4,7 @@ import type { MealWiseStore } from './db/mongo.js';
 import { createStore } from './db/mongo.js';
 import { rateLimit, securityHeaders } from './middleware/security.js';
 import { createChatRouter } from './routes/chat.js';
-import { planRouter } from './routes/plan.js';
+import { createPlanRouter } from './routes/plan.js';
 
 export function createApp(store: MealWiseStore) {
 	const app = express();
@@ -27,8 +27,8 @@ export function createApp(store: MealWiseStore) {
 		response.setHeader('Cache-Control', 'no-store');
 		next();
 	});
-	app.get('/health', (_request, response) => response.json({ ok: true, service: 'mealwise-api', dataSource: 'verified-demo-data' }));
-	app.use('/api/plan', planRouter);
+	app.get('/health', (_request, response) => response.json({ ok: true, service: 'mealwise-api', dataSource: 'quote-snapshots' }));
+	app.use('/api/plan', createPlanRouter(store));
 	app.use('/api/chat', createChatRouter(store));
 	app.use((_request, response) => response.status(404).json({ error: 'Route not found.' }));
 	app.use((error: unknown, _request: express.Request, response: express.Response, _next: express.NextFunction) => {

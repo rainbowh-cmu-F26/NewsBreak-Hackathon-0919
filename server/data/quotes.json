@@ -1,0 +1,106 @@
+[
+  {
+    "comparison_key": "demo_rice_x1",
+    "restaurant": {
+      "restaurant_id": "demo_001",
+      "name": "Demo Mountain View Kitchen",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location_01",
+    "platform": "ubereats",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Vegetable rice bowl",
+        "quantity": 1,
+        "size": "Regular",
+        "modifiers": [],
+        "unit_price_cents": 1200,
+        "line_total_cents": 1200
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "demo_account",
+    "currency": "USD",
+    "subtotal_cents": 1200,
+    "delivery_fee_cents": 199,
+    "service_fee_cents": 150,
+    "tax_cents": 120,
+    "tax_and_fees_combined_cents": null,
+    "other_fees": [],
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 1869,
+    "price_complete": true,
+    "offers": [],
+    "eta_min_minutes": 25,
+    "eta_max_minutes": 40,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "Synthetic demonstration only; not an actual restaurant offer.",
+    "dietary_tags": [
+      "vegetarian"
+    ]
+  },
+  {
+    "comparison_key": "demo_rice_x1",
+    "restaurant": {
+      "restaurant_id": "demo_001",
+      "name": "Demo Mountain View Kitchen",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location_01",
+    "platform": "doordash",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Vegetable rice bowl",
+        "quantity": 1,
+        "size": "Regular",
+        "modifiers": [],
+        "unit_price_cents": 1200,
+        "line_total_cents": 1200
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "demo_account",
+    "currency": "USD",
+    "subtotal_cents": 1200,
+    "delivery_fee_cents": 99,
+    "service_fee_cents": 150,
+    "tax_cents": 120,
+    "tax_and_fees_combined_cents": null,
+    "other_fees": [],
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 1769,
+    "price_complete": true,
+    "offers": [],
+    "eta_min_minutes": 25,
+    "eta_max_minutes": 40,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "Synthetic demonstration only; not an actual restaurant offer.",
+    "dietary_tags": [
+      "vegetarian"
+    ]
+  }
+]

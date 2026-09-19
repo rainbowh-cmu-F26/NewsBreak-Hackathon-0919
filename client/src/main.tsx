@@ -1,4 +1,4 @@
-import { FormEvent, StrictMode, useEffect, useMemo, useState } from 'react';
+import { StrictMode, useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ArrowRight, BadgeCheck, Check, Clock3, Heart, MapPin, MessageCircle, Search, Sparkles, Utensils, WalletCards } from 'lucide-react';
 import { fetchPlan } from './api/plan';
@@ -36,6 +36,25 @@ function App() {
   const [showSavedOnly, setShowSavedOnly] = useState(false);
   const [toast, setToast] = useState('');
   const [chatOpen, setChatOpen] = useState(false);
+  const chatRegion = useRef<HTMLDivElement>(null);
+
+  function focusChat() {
+    chatRegion.current?.scrollIntoView({
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth',
+      block: 'center',
+    });
+    chatRegion.current?.querySelector('input')?.focus({ preventScroll: true });
+  }
+
+  useEffect(() => {
+    if (chatOpen) focusChat();
+  }, [chatOpen]);
+
+  function openChat() {
+    setChatOpen(true);
+    // Returning to an already-open chat should scroll to it again.
+    if (chatOpen) focusChat();
+  }
 
   const visibleOptions = useMemo(() => showSavedOnly ? plan.options.filter((option) => savedIds.includes(option.id)) : plan.options, [plan.options, savedIds, showSavedOnly]);
 
@@ -70,14 +89,14 @@ function App() {
   }
 
   return <div className="app-shell">
-    <header className="topbar"><a className="brand" href="/" aria-label="MealWise home"><span className="brand-mark"><Sparkles size={17} /></span><span>mealwise</span></a><div className="location"><MapPin size={15} /> Mountain View, CA <span className="live-dot" /></div><button className="chat-toggle" onClick={() => setChatOpen((current) => !current)} aria-expanded={chatOpen}><MessageCircle size={16} /> Chat with AI</button><button className={`quiet-button ${showSavedOnly ? 'active' : ''}`} onClick={() => setShowSavedOnly((current) => !current)} aria-pressed={showSavedOnly}><Heart size={16} fill={showSavedOnly ? 'currentColor' : 'none'} /> Saved <span className="saved-count">{savedIds.length}</span></button></header>
+    <header className="topbar"><a className="brand" href="/" aria-label="MealWise home"><span className="brand-mark"><Sparkles size={17} /></span><span>mealwise</span></a><div className="location"><MapPin size={15} /> Mountain View, CA <span className="live-dot" /></div><button className="chat-toggle" onClick={openChat} aria-expanded={chatOpen} aria-controls="mealwise-chat"><MessageCircle size={16} /> Chat with AI</button><button className={`quiet-button ${showSavedOnly ? 'active' : ''}`} onClick={() => setShowSavedOnly((current) => !current)} aria-pressed={showSavedOnly}><Heart size={16} fill={showSavedOnly ? 'currentColor' : 'none'} /> Saved <span className="saved-count">{savedIds.length}</span></button></header>
     <main>
       <section className="hero"><div className="hero-copy"><p className="eyebrow"><span className="eyebrow-line" /> DELIVERY, MADE FAIR</p><h1>More dinner.<br /><em>Less spent.</em></h1><p className="hero-intro">Explore sample delivery prices for meals in Mountain View. Tell us what sounds good and we’ll do the price hunting.</p></div><div className="hero-stamp"><span>01</span><div>Sample prices<br /><strong>side by side</strong></div></div></section>
       <section className="planner-grid">
         <form className="planner-panel" onSubmit={submit}><div className="panel-heading"><div><p className="section-kicker">01 / Your order</p><h2>What are we finding?</h2></div><span className="panel-icon"><Search size={19} /></span></div><label htmlFor="craving">Craving or occasion<input id="craving" value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="e.g. vegetarian lunch for two" required minLength={3} /></label><div className="field-row"><label htmlFor="budget">Max budget<div className="money-input"><span>$</span><input id="budget" type="number" min="1" step="1" value={budget} onChange={(event) => setBudget(Number(event.target.value))} required /></div></label><label htmlFor="dietary">Dietary<select id="dietary" value={dietary} onChange={(event) => setDietary(event.target.value as PlanRequest['dietary'])}><option>No preference</option><option>Vegetarian</option><option>Vegan</option><option>Gluten-aware</option></select></label></div><button className="primary-button" disabled={loading || !prompt.trim() || budget < 1}>{loading ? <><span className="button-spinner" /> Checking local deals...</> : <>Find my best value <ArrowRight size={18} /> </>}</button><p className="fine-print"><BadgeCheck size={14} /> Demo prices · personal coupons not included.</p><div className="quick-searches"><span>Try a quick search</span>{quickSearches.map((search) => <button type="button" key={search.label} onClick={() => applyQuickSearch(search)}>{search.label}<ArrowRight size={13} /></button>)}</div></form>
         <aside className="how-panel"><div className="how-top"><span className="section-kicker">A little magic, transparently</span><Sparkles size={22} /></div><h2>Good food should not require a lucky break.</h2><p>Compare the same meal across platforms, with a clear breakdown of food, delivery, service fees, and estimated tax. This prototype uses illustrative quotes.</p><div className="trust-list"><div><WalletCards size={18} /><span><strong>Budget-first</strong><small>See each fee separately</small></span></div><div><Clock3 size={18} /><span><strong>Time-aware</strong><small>Compare sample delivery times</small></span></div></div></aside>
       </section>
-      {chatOpen && <ChatPanel budget={budget} dietary={dietary} onPlan={(response) => { setPlan(response.plan); setIsPreview(false); setShowSavedOnly(false); window.requestAnimationFrame(() => document.getElementById('shortlist')?.scrollIntoView({ behavior: 'smooth', block: 'start' })); }} />}
+      <div ref={chatRegion} id="mealwise-chat" hidden={!chatOpen}><ChatPanel budget={budget} dietary={dietary} onPlan={(response) => { setPlan(response.plan); setIsPreview(false); setShowSavedOnly(false); }} /></div>
       <section className="results" id="shortlist" aria-busy={loading}>
         <div className="results-header"><div><p className="section-kicker">02 / Compare delivery prices</p><h2>{showSavedOnly ? 'Saved meal comparisons' : 'Same meal. Compare the total.'}</h2></div><span className="demo-label">DEMO · SAMPLE PRICES</span></div>
         <p className="comparison-note">Compare one listed meal or set across two platforms. All quotes below are illustrative, not live platform prices. Personal coupons, memberships, and tips are not included. These quotes may exceed your budget.</p>

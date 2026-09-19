@@ -46,7 +46,7 @@ The local parser supports common English phrases and a finite vocabulary. It is 
 
 ## Fake database and pricing
 
-`server/data/offers.json` is the mock database. It has 11 offer records across cuisines and simulated Uber Eats, DoorDash, and Grubhub labels, including an unavailable fixture. These records are not actual provider data or restaurant claims.
+`server/data/offers.json` is the mock database. It has 13 offer records across cuisines and simulated Uber Eats, DoorDash, and Grubhub labels, including an unavailable fixture. These records are not actual provider data or restaurant claims.
 
 Records describe dietary tags, complete ingredient/allergen metadata, cross-contact, deal types, serving counts, discounted price, delivery/service fees, tax rate, ETA, minimum subtotal, eligibility, location, and availability. `MockOfferProvider` produces a five-minute simulated quote from each record. The timestamp describes a mock quote generation, not a real-world check.
 

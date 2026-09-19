@@ -3,6 +3,7 @@ import test from 'node:test';
 import request from 'supertest';
 import { createApp } from '../app.js';
 import { buildPlan } from '../agent/localAgent.js';
+import { createStore } from '../db/mongo.js';
 import type { ChatRequest, PlanResponse } from '../../shared/schemas.js';
 import type { MealWiseStore } from '../db/mongo.js';
 
@@ -36,4 +37,60 @@ test('persists chat turns and returns a plan', async () => {
   assert.equal(response.body.plan.options[0].restaurant, 'Green Garden');
   assert.equal(store.turns.length, 1);
   assert.equal(store.turns[0].request.message, 'Find a vegan dinner');
+});
+
+test('rejects malformed JSON and sends baseline security headers', async () => {
+  const response = await request(createApp(new TestStore()))
+    .post('/api/chat')
+    .set('Content-Type', 'application/json')
+    .send('{"message":');
+
+  assert.equal(response.status, 400);
+  assert.equal(response.body.error, 'Request body must be valid JSON.');
+  assert.equal(response.headers['x-content-type-options'], 'nosniff');
+  assert.equal(response.headers['x-frame-options'], 'DENY');
+});
+
+test('requires a CORS allowlist in production', () => {
+  const previousNodeEnv = process.env.NODE_ENV;
+  const previousCorsOrigin = process.env.CORS_ORIGIN;
+  process.env.NODE_ENV = 'production';
+  delete process.env.CORS_ORIGIN;
+  try {
+    assert.throws(() => createApp(new TestStore()), /CORS_ORIGIN must be configured in production/);
+  } finally {
+    process.env.NODE_ENV = previousNodeEnv;
+    if (previousCorsOrigin === undefined) delete process.env.CORS_ORIGIN;
+    else process.env.CORS_ORIGIN = previousCorsOrigin;
+  }
+});
+
+test('requires MongoDB in production', async () => {
+  const previousNodeEnv = process.env.NODE_ENV;
+  const previousMongoUri = process.env.MONGODB_URI;
+  process.env.NODE_ENV = 'production';
+  delete process.env.MONGODB_URI;
+  try {
+    await assert.rejects(() => createStore(), /MONGODB_URI must be configured in production/);
+  } finally {
+    process.env.NODE_ENV = previousNodeEnv;
+    if (previousMongoUri === undefined) delete process.env.MONGODB_URI;
+    else process.env.MONGODB_URI = previousMongoUri;
+  }
+});
+
+test('keeps in-memory store for non-production without MongoDB URI', async () => {
+  const previousNodeEnv = process.env.NODE_ENV;
+  const previousMongoUri = process.env.MONGODB_URI;
+  process.env.NODE_ENV = 'test';
+  delete process.env.MONGODB_URI;
+  try {
+    const store = await createStore();
+    await assert.doesNotReject(() => store.saveConversationTurn('conversation', { message: 'Hi', budget: 10, dietary: 'No preference' }, 'reply', buildPlan({ prompt: 'Dinner', budget: 10, dietary: 'No preference' })));
+    await store.close();
+  } finally {
+    process.env.NODE_ENV = previousNodeEnv;
+    if (previousMongoUri === undefined) delete process.env.MONGODB_URI;
+    else process.env.MONGODB_URI = previousMongoUri;
+  }
 });

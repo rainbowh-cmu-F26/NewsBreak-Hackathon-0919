@@ -24,6 +24,7 @@ MealWise is a delivery savings agent for low-income residents in Mountain View. 
 │   └── package.json
 ├── shared/                 # Request and response contracts
 ├── .env.example
+├── .github/workflows/ci.yml # GitHub Actions validation workflow
 └── package.json            # Workspace scripts
 ```
 
@@ -100,6 +101,17 @@ npm test --workspace server
 The tests cover deterministic ranking, budget and dietary filtering, malformed request responses, chat response shape, and persistence calls using a fake store. They do not require a live MongoDB connection.
 
 For a built-in Node coverage summary, run `npm run test:coverage --workspace server`.
+
+## Continuous integration
+
+GitHub Actions runs on every branch push and pull request to `main` or `master`. The workflow installs with the lockfile, audits production dependencies, runs backend tests with coverage, typechecks the server, builds the frontend, and checks for whitespace errors. It does not require MongoDB because tests inject an in-memory test store.
+
+## Security
+
+- Production startup requires both `CORS_ORIGIN` and `MONGODB_URI`.
+- API responses include baseline clickjacking, MIME-sniffing, and referrer protections.
+- Planner and chat routes are rate-limited per server instance and reject oversized or malformed JSON.
+- User text is validated and rendered through React escaping; no provider secrets belong in source code.
 
 ## Deployment
 

@@ -59,7 +59,12 @@ class MongoStore implements MealWiseStore {
 }
 
 export async function createStore(uri = process.env.MONGODB_URI, databaseName = process.env.MONGODB_DATABASE || 'mealwise') {
-  if (!uri) return new MemoryStore();
+  if (!uri) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('MONGODB_URI must be configured in production.');
+    }
+    return new MemoryStore();
+  }
   const client = new MongoClient(uri, { serverSelectionTimeoutMS: 3000 });
   await client.connect();
   const database = client.db(databaseName);

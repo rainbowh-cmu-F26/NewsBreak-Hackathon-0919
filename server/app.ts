@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import type { MealWiseStore } from './db/mongo.js';
 import { createStore } from './db/mongo.js';
+import { rateLimit, securityHeaders } from './middleware/security.js';
 import { createChatRouter } from './routes/chat.js';
 import { planRouter } from './routes/plan.js';
 
@@ -19,7 +20,9 @@ export function createApp(store: MealWiseStore) {
 			return callback(new Error('Origin is not allowed by CORS'));
 		} : true
 	}));
+	app.use(securityHeaders);
 	app.use(express.json({ limit: '32kb' }));
+	app.use('/api', rateLimit);
 	app.use((_request, response, next) => {
 		response.setHeader('Cache-Control', 'no-store');
 		next();
@@ -29,6 +32,12 @@ export function createApp(store: MealWiseStore) {
 	app.use('/api/chat', createChatRouter(store));
 	app.use((_request, response) => response.status(404).json({ error: 'Route not found.' }));
 	app.use((error: unknown, _request: express.Request, response: express.Response, _next: express.NextFunction) => {
+		if (error instanceof SyntaxError && 'status' in error && error.status === 400) {
+			return response.status(400).json({ error: 'Request body must be valid JSON.' });
+		}
+		if (error instanceof Error && error.message === 'Origin is not allowed by CORS') {
+			return response.status(403).json({ error: 'Origin is not allowed.' });
+		}
 		console.error(error);
 		return response.status(500).json({ error: 'The planner is temporarily unavailable.' });
 	});

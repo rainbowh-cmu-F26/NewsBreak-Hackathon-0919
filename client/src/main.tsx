@@ -84,6 +84,25 @@ function App() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    const version = planRequestVersion.current;
+    const isCurrent = () => !cancelled && version === planRequestVersion.current;
+
+    void fetchDefaultPlan()
+      .then(defaultPlan => {
+        if (isCurrent()) setPlan(defaultPlan);
+      })
+      .catch(caught => {
+        if (isCurrent()) setError(caught instanceof Error ? caught.message : 'Something went wrong.');
+      })
+      .finally(() => {
+        if (isCurrent()) setLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, []);
+
+  useEffect(() => {
     if (!toast) return undefined;
     const timer = window.setTimeout(() => setToast(''), 2400);
     return () => window.clearTimeout(timer);

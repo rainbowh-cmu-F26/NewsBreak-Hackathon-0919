@@ -5,3 +5,7 @@ import { postJson } from './request';
 export async function fetchPlan(request: PlanRequest): Promise<PlanResponse> {
   return planResponseSchema.parse(await postJson('/api/plan', request));
 }
+
+export async function fetchDefaultPlan(): Promise<PlanResponse> {
+  return planResponseSchema.parse(await postJson('/api/plan/defaults', {}));
+}

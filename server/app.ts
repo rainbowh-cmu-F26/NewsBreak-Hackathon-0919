@@ -1,6 +1,9 @@
 import './env.js';
 import cors from 'cors';
 import express from 'express';
+import type { ChatRequest, PlanResponse } from '../shared/schemas.js';
+import type { ConversationContext } from '../shared/intent.js';
+import type { Quote } from '../shared/quotes.js';
 import type { MealWiseStore } from './db/mongo.js';
 import { createStore } from './db/mongo.js';
 import { rateLimit, securityHeaders } from './middleware/security.js';

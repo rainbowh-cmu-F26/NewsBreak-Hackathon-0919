@@ -7,9 +7,21 @@ The HTTP planner and chat endpoints use the same `FoodAgent` workflow:
 3. Ask for clarification if interpretation is uncertain or unavailable.
 4. Search registered offer providers.
 5. Validate every returned record, enforce constraints in code, calculate a group quote, and rank eligible offers.
-6. Generate a factual reply from the selected records and persist the next conversation state.
+6. Let the model inspect the validated shortlist with read-only catalog tools, generate a conversational reply, and persist the next conversation state.
 
-The model extracts preferences; it does not generate offer records, prices, SQL, network URLs, or executable tool code. This is a bounded search workflow, not an ordering or checkout agent.
+The model extracts preferences and selects structured actions; the server executes only allowlisted catalog functions. It does not execute model-generated code, URLs, or SQL. This is a bounded search workflow, not an ordering or checkout agent.
+
+## Interactive catalog tools
+
+After intent extraction and the initial validated search, `CatalogConversation` can choose `searchOffers`, `getOfferDetails`, or `explainNoMatches`, then `respond`. The action loop uses validated structured JSON on both Gemini and OpenAI. It allows at most three additional tool calls and four model requests within a shared 15-second deadline. Extraction has its own 12-second deadline; provider retrieval has a five-second deadline. The browser allows 35 seconds for the complete request.
+
+Tools operate on the same provider snapshot. Details are limited to the current validated shortlist. Empty-result diagnostics test individual changes to cuisine, food, deal, platform, time, budget, or new-customer eligibility, returning hypothetical counts and prices. They never mutate the active intent or relax dietary, allergy, ingredient-exclusion, or location checks. The assistant asks before applying a suggested change; the next user message authorizes it through intent extraction.
+
+Replies are grounded in tool results. Recommended IDs and dollar amounts are checked against the available evidence. Natural-language statements are still model-generated, so these checks are not a proof of every sentence; allergy metadata in demo records is not a medical guarantee. If response generation fails, the server returns the validated deterministic summary with a warning. An extraction failure still returns no recommendations.
+
+Broad cuisine groups such as Asian, East Asian, Southeast Asian, and South Asian expand to specific cuisine labels in both model and local search. The model receives the supported vocabulary. Explicit optional preferences such as “preferably dairy-free” go into separate preference fields and rank eligible results; unqualified requirements still filter results. “Chicken, preferably dairy-free” requires chicken and prefers dairy-free dishes. Unknown specific cuisines remain constraints rather than being silently discarded.
+
+The model receives up to eight recent user/assistant messages along with the saved intent. This allows ingredient questions and answers such as “yes please” to a proposed filter change. Local mode remains a limited parser and does not run the conversational action loop. Injecting an explicit extractor isolates extraction; to use a custom extractor with model conversation, pass a `CatalogConversation` as the third `FoodAgent` argument.
 
 ## Run it
 
@@ -28,10 +40,13 @@ GEMINI_MODEL=gemini-3.5-flash-lite
 
 `auto` uses the selected provider when its key is configured and otherwise uses the local parser. `local` always uses the offline parser. `model` requires a key and returns an unavailable response when it is missing. The UI labels which interpreter produced the result. Never put the key in a `VITE_` variable.
 
-The OpenAI integration uses the [Responses API with structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs), validates the result with Zod, sets `store: false`, and has a 12-second deadline. Only the current message, saved structured intent, form defaults, and previous best total are sent. Refusals, incomplete responses, invalid output, timeouts, and API errors return no recommendations rather than guessing. The Gemini adapter uses [GenerateContent](https://ai.google.dev/api/generate-content), the same intent schema and 12-second deadline, and sends the key only in the `x-goog-api-key` header. Its model output is validated before catalog search. Tests inject model responses and never make paid model calls.
+The OpenAI integration uses the [Responses API with structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs), validates the result with Zod, sets `store: false`, and has a 12-second deadline. Extraction sends the current message, saved structured intent, up to eight recent messages, supported vocabulary, form defaults, and previous best total. The conversational stage also receives validated search results and requested catalog details. Refusals, incomplete responses, invalid output, timeouts, and API errors return no recommendations rather than guessing. The Gemini adapter uses [GenerateContent](https://ai.google.dev/api/generate-content), the same intent schema and 12-second deadline, and sends the key only in the `x-goog-api-key` header. Its model output is validated before catalog search. Tests inject model responses and never make paid model calls.
 
 ## Try these requests
 
+- “Asian food” → expands to Chinese, Thai, Vietnamese, Indian, Japanese, and Korean categories.
+- “Chicken, preferably dairy-free”, then “Does the curry contain milk?” → prioritizes the dairy-free chicken bowl and uses catalog details for the question.
+- “Chicken BOGO”, then an answer to the assistant’s proposed change → diagnoses the deal conflict and updates only the accepted preference.
 - “Vegan Mexican BOGO for two under $20 on Grubhub” → one simulated taco bundle for two, estimated $12.49.
 - “Vegetarian noodles under $20”, then “No noodles, Mexican instead” → preserves budget/diet, excludes noodles, and changes cuisine.
 - “Make it cheaper” → keeps restrictions and searches strictly below the last recommended total.
@@ -44,9 +59,19 @@ Budget is for the entire group. “$10 per person for two” becomes $20. Explic
 
 The local parser supports common English phrases and a finite vocabulary. It is not equivalent to model interpretation; unfamiliar wording may need rephrasing. Numeric budgets are supported, while some word-only budgets prompt for digits. Medical diet claims require clarification. A demo result is not an allergy-safety guarantee.
 
+## MongoDB food catalog
+
+When `MONGODB_URI` is configured, application startup wires both chat and planner searches to `mealwise.quotes` (or `MONGODB_DATABASE`). Each search reads the collection again; local JSON food fixtures are not used as a fallback for empty results, invalid records, or database failures. Without MongoDB, development mode retains the local demo catalog.
+
+The database uses the `shared/quotes.ts` schema imported from main. `DatabaseOfferProvider` validates these records and adapts them to the agent. Complete stored totals are used exactly once, including their recorded fees, tax, tips and discounts. Single-item menu-only records receive explicitly labeled demo delivery estimates using the existing simulation assumptions; they are not presented as real checkout quotes. Stale checkout snapshots, unavailable records, unknown platforms, membership-dependent offers and unconfirmed applied discounts are rejected. Synthetic records remain labeled as simulated even though they come from MongoDB.
+
+The adapter derives cuisine/food search hints from restaurant and item names; these are approximate and should eventually be replaced with explicit catalog tags. It does not infer dietary or allergy safety: missing ingredient/allergen completeness excludes restricted searches. Stored order quantities do not establish how many people a meal feeds, so group pricing is unavailable rather than multiplying a checkout quote. The shortlist shows one option per restaurant and includes comparable qualifying platform totals when order conditions match.
+
+API responses identify `dataSource: database-data`, and the UI renders the returned quote breakdown instead of hard-coded platform prices. Local files remain only as offline test/import fixtures. Use `new FoodAgent(undefined, [new DatabaseOfferProvider(store.listQuotes.bind(store))])` for explicit database-agent construction, or simply `createApp(store)` with the MongoDB store.
+
 ## Fake database and pricing
 
-`server/data/offers.json` is the mock database. It has 11 offer records across cuisines and simulated Uber Eats, DoorDash, and Grubhub labels, including an unavailable fixture. These records are not actual provider data or restaurant claims.
+`server/data/offers.json` is the offline development/test mock database, used only when no database catalog provider is configured. It has 13 offer records across cuisines and simulated Uber Eats, DoorDash, and Grubhub labels, including an unavailable fixture. These records are not actual provider data or restaurant claims.
 
 Records describe dietary tags, complete ingredient/allergen metadata, cross-contact, deal types, serving counts, discounted price, delivery/service fees, tax rate, ETA, minimum subtotal, eligibility, location, and availability. `MockOfferProvider` produces a five-minute simulated quote from each record. The timestamp describes a mock quote generation, not a real-world check.
 
@@ -56,7 +81,7 @@ Prices, tax rules, eligibility, and quantity behavior are simplified fixtures. T
 
 ## Adding real providers
 
-Implement `OfferProvider` from `server/providers/types.ts` for each authorized integration. Its `search(intent, signal)` method must return records conforming to `catalogOfferSchema` and honor cancellation. Inject the adapters with `new FoodAgent(extractor, providers)` and pass that agent to `createApp(store, agent)`.
+Implement `OfferProvider` from `server/providers/types.ts` for each authorized integration. Its `search(intent, signal)` method must return records conforming to `catalogOfferSchema` and honor cancellation. Inject the adapters with `new FoodAgent(undefined, providers)` to retain the default model conversation and pass that agent to `createApp(store, agent)`.
 
 Adapters should authenticate server-side, translate queries, normalize cuisines/ingredients/tags, resolve account-specific promotion eligibility, and return current quote timestamps/expiry. Do not label data complete unless the source actually provides it. The planner rechecks schema validity, availability, freshness, location, budget, and all constraints after retrieval. Provider searches run independently with a five-second deadline; partial failures are surfaced. Registering live adapters disables mock results entirely, including during outages.
 

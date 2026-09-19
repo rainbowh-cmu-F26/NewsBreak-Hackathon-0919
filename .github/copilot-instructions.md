@@ -1074,4 +1074,3 @@ When changing pricing or ranking behavior, check the corresponding backend logic
 When working with agent-generated content, always prefer structured application data over model-generated guesses.
 
 The goal is to keep MealWise coherent across the frontend, backend, agent, provider, simulation, and shared-schema layers.
-

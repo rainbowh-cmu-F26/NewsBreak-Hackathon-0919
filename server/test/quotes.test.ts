@@ -23,12 +23,7 @@ test('rejects snapshots without evidence and complete quotes without total', () 
   assert.equal(quoteSchema.safeParse({...quotes[0], displayed_total_cents: null}).success, false);
 });
 test('plan and chat read quotes from the injected database store', async () => {
-  const store = {
-    listQuotes: async () => [{...quotes[0], displayed_total_cents: 999}],
-    getConversationContext: async () => null,
-    saveConversationTurn: async () => {},
-    close: async () => {}
-  };
+  const store = { listQuotes: async () => [{...quotes[0], displayed_total_cents: 999}], getConversationContext: async () => null, saveConversationTurn: async () => {}, close: async () => {} };
   for (const path of ['plan', 'chat']) {
     const body = path === 'plan' ? input : {message: input.prompt, budget: 20, dietary: input.dietary};
     const result = await request(createApp(store)).post(`/api/${path}`).send(body);

@@ -2,13 +2,16 @@ import { z } from 'zod';
 
 export const dietaryValues = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'halal', 'kosher'] as const;
 export const dealValues = ['bogo', 'discount', 'free-delivery'] as const;
-export const providerValues = ['uber-eats', 'doordash', 'grubhub'] as const;
+export const providerValues = ['uber-eats', 'doordash', 'grubhub', 'restaurant-direct'] as const;
 const terms = z.array(z.string().trim().min(1).max(60)).max(15);
 
 export const intentSchema = z.object({
   budget: z.number().finite().positive().max(500),
   dietary: z.array(z.enum(dietaryValues)).max(6),
   cuisines: terms,
+  preferredCuisines: terms.default([]),
+  preferredFoods: terms.default([]),
+  preferredDietary: z.array(z.enum(dietaryValues)).max(6).default([]),
   excludedCuisines: terms,
   foods: terms,
   excludedIngredients: terms,
@@ -41,5 +44,6 @@ export const conversationContextSchema = z.object({
   formBudget: z.number(),
   formDietary: z.string(),
   lastBestTotal: z.number().nullable(),
+  recentTurns: z.array(z.object({ role: z.enum(['user', 'assistant']), content: z.string().max(3000) })).max(8).default([]),
 });
 export type ConversationContext = z.infer<typeof conversationContextSchema>;

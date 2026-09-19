@@ -137,6 +137,23 @@ test('explicitly removing a food exclusion restores otherwise matching results',
   assert.deepEqual(second.plan.agent.intent.excludedIngredients, []);
 });
 
+test('ordinary chicken requests find dishes without assuming promotion eligibility', async () => {
+  const result = await agent().run(input("hello, i'm looking for chicken dishes"));
+  assert.deepEqual(result.plan.agent.intent.foods, ['chicken']);
+  assert.equal(result.plan.agent.intent.newCustomer, null);
+  assert.deepEqual(result.plan.options.map((option) => option.id), ['uber-eats:p12', 'grubhub:p13']);
+  assert.ok(result.plan.options.every((option) => option.tags.includes('chicken') && option.total! <= 25));
+  const returning = await agent().run(input('I am a returning customer'), result.context);
+  assert.equal(returning.plan.options.length, 2);
+});
+
+test('chicken options still respect diet, allergy and total budget restrictions', () => {
+  const intent = extractLocal(input('Chicken dishes')).intent;
+  assert.equal(planOffers({ ...intent, dietary: ['vegan'] }, mockRows()).options.length, 0);
+  assert.equal(planOffers({ ...intent, budget: 10 }, mockRows()).options.length, 0);
+  assert.deepEqual(planOffers({ ...intent, allergens: ['milk'] }, mockRows()).options.map((option) => option.id), ['uber-eats:p12']);
+});
+
 test('new-customer promotion is unavailable until eligibility is explicit', async () => {
   const first = await agent().run(input('Chicken tacos on DoorDash under $25'));
   assert.equal(first.plan.options.length, 0);

@@ -1,7 +1,9 @@
 import type { ChatRequest } from '../../shared/schemas.js';
 import { intentSchema, type ConversationContext, type FoodIntent } from '../../shared/intent.js';
+import { cuisineGroups, normalizeIntent } from './vocabulary.js';
 
 const cuisineAliases: Record<string, string> = {
+  ...Object.fromEntries(Object.keys(cuisineGroups).map((term) => [term, term])),
   chinese: 'chinese', mexican: 'mexican', thai: 'thai', vietnamese: 'vietnamese',
   indian: 'indian', italian: 'italian', japanese: 'japanese', korean: 'korean',
   mediterranean: 'mediterranean', american: 'american', ethiopian: 'ethiopian',
@@ -65,6 +67,8 @@ export function extractLocal(request: ChatRequest, previous?: ConversationContex
   const reset = /\b(start over|reset (?:my |the )?(?:search|filters)|new search)\b/.test(text);
   const intent = structuredClone(baseIntent(request, reset ? null : previous));
   let clarification: string | null = null;
+  const preferenceText = (text.match(/\b(?:preferably|ideally|if possible)[^.!?;]*/g) ?? []).join(' ');
+  const requiredText = text.replace(/\b(?:preferably|ideally|if possible)[^.!?;]*/g, '');
   const budget = text.match(/(?:under|below|less than|up to|at most|budget(?: of| is)?|max(?:imum)?(?: of)?)\s*\$?\s*(\d+(?:\.\d{1,2})?)(?![\d.])(?:\s*(dollars?|bucks?))?/)
     ?? text.match(/\$\s*(\d+(?:\.\d{1,2})?)/)
     ?? text.match(/(\d+(?:\.\d{1,2})?)\s*(?:dollars?|bucks?)\b/);
@@ -100,23 +104,31 @@ export function extractLocal(request: ChatRequest, previous?: ConversationContex
   if (/\b(fastest|quickest)\b/.test(text)) intent.sortBy = 'fastest';
   if (/\b(best value|biggest savings)\b/.test(text)) intent.sortBy = 'best-value';
 
-  const diets = mentions(text, { vegan: 'vegan', vegetarian: 'vegetarian', 'gluten-free': 'gluten-free', 'gluten free': 'gluten-free', 'dairy-free': 'dairy-free', 'dairy free': 'dairy-free', halal: 'halal', kosher: 'kosher' });
+  const dietAliases = { vegan: 'vegan', vegetarian: 'vegetarian', 'gluten-free': 'gluten-free', 'gluten free': 'gluten-free', 'dairy-free': 'dairy-free', 'dairy free': 'dairy-free', halal: 'halal', kosher: 'kosher' };
+  const diets = mentions(requiredText, dietAliases);
+  if (preferenceText) {
+    intent.preferredDietary = mentions(preferenceText, dietAliases).positive as FoodIntent['preferredDietary'];
+    intent.preferredCuisines = mentions(preferenceText, cuisineAliases).positive;
+    intent.preferredFoods = mentions(preferenceText, foodAliases).positive;
+  }
   if (/\b(no dietary restrictions|any diet)\b/.test(text)) intent.dietary = [];
   intent.dietary = unique([...intent.dietary, ...diets.positive]).filter((diet) => !diets.negative.includes(diet)) as FoodIntent['dietary'];
   if (/\b(no meat|meat[- ]free)\b/.test(text) && !intent.dietary.includes('vegetarian')) intent.dietary.push('vegetarian');
   if (/\b(lactose intoleran\w*|lactose[- ]free)\b/.test(text) && !intent.dietary.includes('dairy-free')) intent.dietary.push('dairy-free');
   if (/\b(?:vegetarian instead|actually vegetarian)\b/.test(text)) intent.dietary = intent.dietary.filter((diet) => diet !== 'vegan');
 
-  const cuisine = mentions(text, cuisineAliases);
+  const cuisine = mentions(requiredText, cuisineAliases);
+  if (cuisine.positive.some((term) => term.endsWith(' asian'))) cuisine.positive = cuisine.positive.filter((term) => term !== 'asian');
+  if (cuisine.negative.some((term) => term.endsWith(' asian'))) cuisine.negative = cuisine.negative.filter((term) => term !== 'asian');
   if (cuisine.positive.length) intent.cuisines = cuisine.positive;
   if (/\b(any cuisine|all cuisines)\b/.test(text)) intent.cuisines = [];
   intent.excludedCuisines = unique([...intent.excludedCuisines, ...cuisine.negative]).filter((value) => !cuisine.removed.includes(value) && !cuisine.positive.includes(value));
   intent.cuisines = intent.cuisines.filter((value) => !intent.excludedCuisines.includes(value));
 
-  const foods = mentions(text, foodAliases);
+  const foods = mentions(requiredText, foodAliases);
   if (foods.positive.length) intent.foods = foods.positive;
   if (/\b(any food|anything to eat)\b/.test(text)) intent.foods = [];
-  const ingredients = mentions(text, ingredientAliases);
+  const ingredients = mentions(requiredText, ingredientAliases);
   intent.excludedIngredients = unique([...intent.excludedIngredients, ...ingredients.negative]).filter((value) => !ingredients.removed.includes(value));
   intent.foods = intent.foods.filter((value) => !intent.excludedIngredients.includes(value));
   const allergy = text.match(/\b(?:allergic to|allergy to)\s+([^.!?;]+)/);
@@ -154,5 +166,5 @@ export function extractLocal(request: ChatRequest, previous?: ConversationContex
   if (!recognized) clarification = 'What would you like to eat? Include a cuisine, dietary preference, or budget so I can search the demo catalog.';
   const parsed = intentSchema.safeParse(intent);
   if (!parsed.success) return { intent: baseIntent(request, previous), clarification: 'That request contains more constraints than I can handle at once. Please narrow the list and try again.' };
-  return { intent: parsed.data, clarification };
+  return { intent: normalizeIntent(parsed.data), clarification };
 }

@@ -30,12 +30,12 @@ function quote(offer: CatalogOffer, intent: FoodIntent, mock: boolean): Delivery
   if (offer.storedQuote) {
     const q = offer.storedQuote;
     const total = q.displayed_total_cents! / 100;
-    return { id: `${offer.provider}:${offer.id}`, provider: offer.provider, restaurant: offer.restaurant, item: offer.item,
-      price: total, originalPrice: total, fee: 0, total, quantity: 1, servings: 1, savings: 0, cuisine: offer.cuisine,
+    return { id: `${offer.provider}:${offer.id}`, provider: offer.provider, restaurant: offer.restaurant, restaurant_id: q.restaurant.restaurant_id, sourceOffer: q.source_offer, item: offer.item,
+      price: total, originalPrice: total, fee: 0, total, quantity: 1, servings: offer.servings, savings: 0, cuisine: offer.cuisine,
       eta: q.eta_max_minutes === null ? 'ETA unavailable' : `Up to ${q.eta_max_minutes} min`, badge: q.data_type === 'synthetic' ? 'Simulated quote' : 'Stored quote',
       detail: offer.description, tags: [...offer.dietary, ...offer.foods], available: true, verified: q.data_type === 'checkout_snapshot' && q.verification_status === 'verified',
       source: 'MongoDB quotes', sourceUrl: q.platform_store_url, verifiedAt: q.captured_at ? new Date(q.captured_at).toISOString() : '',
-      quote: { dataType: q.data_type, subtotal: q.subtotal_cents, delivery: q.delivery_fee_cents, service: q.service_fee_cents, tax: q.tax_cents, tip: q.tip_cents, discount: q.additional_discount_cents, total: q.displayed_total_cents },
+      quote: { platform: q.platform, capturedAt: q.captured_at ? new Date(q.captured_at).toISOString() : null, combined: q.tax_and_fees_combined_cents, other: q.other_fees, dataType: q.data_type, subtotal: q.subtotal_cents, delivery: q.delivery_fee_cents, service: q.service_fee_cents, tax: q.tax_cents, tip: q.tip_cents, discount: q.additional_discount_cents, total: q.displayed_total_cents },
       priceNote: 'Stored total used once, including the recorded fees, tax, tip and discounts. Synthetic quotes and estimates from menu prices are simulated, not live checkout prices.' };
   }
   const quantity = Math.ceil(intent.servings / offer.servings);
@@ -66,7 +66,7 @@ export function planOffers(intent: FoodIntent, rows: unknown[], mock = true, now
     const offer = parsed.data;
     if (!offer.available || Date.parse(offer.expiresAt) <= now || Date.parse(offer.checkedAt) > now + 60_000) continue;
     // Stored checkout totals cannot safely be multiplied for a different group size.
-    if (offer.storedQuote && intent.servings !== 1) continue;
+    if (offer.storedQuote && intent.servings > offer.servings) continue;
     if (offer.storedQuote && intent.maxEtaMinutes !== null && offer.storedQuote.eta_max_minutes === null) continue;
     if (canonical(offer.location) !== canonical(intent.location)) continue;
     if (intent.providers.length && !intent.providers.includes(offer.provider)) continue;
@@ -80,7 +80,7 @@ export function planOffers(intent: FoodIntent, rows: unknown[], mock = true, now
     if (intent.maxEtaMinutes !== null && offer.etaMinutes > intent.maxEtaMinutes) continue;
     if (offer.newCustomerOnly && intent.newCustomer !== true) continue;
     const option = quote(offer, intent, mock);
-    if (cents(option.price) < cents(offer.minimumOrder) || cents(option.total!) > cents(intent.budget)) continue;
+    if ((offer.storedQuote?.subtotal_cents ?? cents(option.price)) < cents(offer.minimumOrder) || cents(option.total!) > cents(intent.budget)) continue;
     if (seen.has(option.id)) continue;
     seen.add(option.id);
     const q = offer.storedQuote;
@@ -106,7 +106,7 @@ export function planOffers(intent: FoodIntent, rows: unknown[], mock = true, now
       option.comparisons = eligible.filter((entry) => entry.comparisonKey === comparisonKey).flatMap(({ option: candidate }) => {
         const q = candidate.quote!;
         if ([q.subtotal, q.delivery, q.service, q.tax, q.tip, q.discount, q.total].some((value) => value === null)) return [];
-        return [{ platform: candidate.provider!, subtotal: q.subtotal!, delivery: q.delivery!, service: q.service!, tax: q.tax!, tip: q.tip!, discount: q.discount!, total: q.total! }];
+        return [{ platform: candidate.provider!, eta: candidate.eta, subtotal: q.subtotal!, delivery: q.delivery!, service: q.service!, tax: q.tax!, tip: q.tip!, discount: q.discount!, total: q.total! }];
       });
     }
     options.push(option);

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { agentDetailsSchema, providerValues } from './intent.js';
+import { sourceOfferSchema } from './quotes.js';
 
 export const planRequestSchema = z.object({
   prompt: z.string().trim().min(3, 'Describe what you want to eat.').max(160, 'Keep the craving under 160 characters.'),
@@ -11,6 +12,8 @@ export type PlanRequest = z.infer<typeof planRequestSchema>;
 export const deliveryOptionSchema = z.object({
   id: z.string(),
   restaurant: z.string(),
+  restaurant_id: z.string().optional(),
+  sourceOffer: sourceOfferSchema.optional(),
   item: z.string(),
   price: z.number().nonnegative(),
   originalPrice: z.number().nonnegative(),
@@ -33,8 +36,8 @@ export const deliveryOptionSchema = z.object({
   savings: z.number().nonnegative().optional(),
   priceNote: z.string().optional(),
   sourceUrl: z.string().nullable().optional(),
-  quote: z.object({ dataType: z.enum(['menu_only', 'synthetic', 'checkout_snapshot']), subtotal: z.number().nullable(), delivery: z.number().nullable(), service: z.number().nullable(), tax: z.number().nullable(), tip: z.number().nullable(), discount: z.number().nullable(), total: z.number().nullable() }).optional(),
-  comparisons: z.array(z.object({ platform: z.string(), subtotal: z.number(), delivery: z.number(), service: z.number(), tax: z.number(), tip: z.number(), discount: z.number(), total: z.number() })).optional(),
+  quote: z.object({ platform: z.string().optional(), capturedAt: z.string().nullable().optional(), combined: z.number().nullable().optional(), other: z.array(z.object({name: z.string(), amount_cents: z.number()})).optional(), dataType: z.enum(['menu_only', 'synthetic', 'checkout_snapshot']), subtotal: z.number().nullable(), delivery: z.number().nullable(), service: z.number().nullable(), tax: z.number().nullable(), tip: z.number().nullable(), discount: z.number().nullable(), total: z.number().nullable() }).optional(),
+  comparisons: z.array(z.object({ platform: z.string(), eta: z.string().optional(), subtotal: z.number(), delivery: z.number(), service: z.number(), tax: z.number(), tip: z.number(), discount: z.number(), total: z.number() })).optional(),
 });
 
 export type DeliveryOption = z.infer<typeof deliveryOptionSchema>;

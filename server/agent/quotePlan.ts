@@ -40,7 +40,7 @@ export function planQuoteRows(request: PlanRequest & { mode?: 'menu' | 'simulati
     if (comparable.length > 1) option.comparisons = comparable.flatMap((candidate) => {
       const q = candidate.quote!;
       if ([q.subtotal, q.delivery, q.service, q.tax, q.tip, q.discount, q.total].some((value) => value === null)) return [];
-      return [{ platform: candidate.provider!, subtotal: q.subtotal!, delivery: q.delivery!, service: q.service!, tax: q.tax!, tip: q.tip!, discount: q.discount!, total: q.total! }];
+      return [{ platform: candidate.provider!, eta: candidate.eta, subtotal: q.subtotal!, delivery: q.delivery!, service: q.service!, tax: q.tax!, tip: q.tip!, discount: q.discount!, total: q.total! }];
     });
     selected.set(option.restaurant, option);
   }

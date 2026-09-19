@@ -1,0 +1,1136 @@
+[
+  {
+    "comparison_key": "bogo_p9",
+    "restaurant": {
+      "restaurant_id": "user_masa_verde",
+      "name": "Masa Verde",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location",
+    "platform": "grubhub",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Black bean taco duo BOGO",
+        "quantity": 1,
+        "size": "BOGO bundle \u00b7 serves 2",
+        "modifiers": [],
+        "unit_price_cents": 1100,
+        "line_total_cents": 1100
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "three_platform_demo_v1",
+    "currency": "USD",
+    "other_fees": [],
+    "price_complete": true,
+    "offers": [
+      {
+        "description": "Simulated BOGO included in bundle subtotal; do not subtract again.",
+        "applied": true,
+        "eligibility_status": "confirmed"
+      }
+    ],
+    "eta_min_minutes": 30,
+    "eta_max_minutes": 30,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "User-provided simulated offer. Bundle price already includes BOGO. Tax assumption: 9% of discounted item subtotal, rounded to cents. Includes the same $2 tip as other scenarios. Ingredients, dietary and allergy information are demo assertions, not independently verified. Restaurant delivery availability is hypothetical.",
+    "dietary_tags": [
+      "vegan",
+      "vegetarian",
+      "gluten-aware"
+    ],
+    "subtotal_cents": 1100,
+    "delivery_fee_cents": 0,
+    "service_fee_cents": 50,
+    "tax_cents": 99,
+    "tax_and_fees_combined_cents": null,
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 1449,
+    "source_offer": {
+      "id": "p9",
+      "provider": "grubhub",
+      "restaurant": "Masa Verde",
+      "item": "Black bean taco duo BOGO",
+      "cuisine": "mexican",
+      "foods": [
+        "tacos"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "ingredients": [
+        "black bean",
+        "corn",
+        "tomato",
+        "onion",
+        "cilantro"
+      ],
+      "allergens": [],
+      "mayContain": [],
+      "ingredientInfoComplete": true,
+      "allergyInfoComplete": true,
+      "price": 11,
+      "originalPrice": 22,
+      "deliveryFee": 0,
+      "serviceFee": 0.5,
+      "taxRate": 0.09,
+      "servings": 2,
+      "etaMinutes": 30,
+      "deals": [
+        "bogo",
+        "discount",
+        "free-delivery"
+      ],
+      "minimumOrder": 0,
+      "newCustomerOnly": false,
+      "available": true,
+      "location": "Mountain View",
+      "description": "Simulated BOGO taco meals for two, with free delivery."
+    }
+  },
+  {
+    "comparison_key": "bogo_p9",
+    "restaurant": {
+      "restaurant_id": "user_masa_verde",
+      "name": "Masa Verde",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location",
+    "platform": "ubereats",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Black bean taco duo BOGO",
+        "quantity": 1,
+        "size": "BOGO bundle \u00b7 serves 2",
+        "modifiers": [],
+        "unit_price_cents": 1200,
+        "line_total_cents": 1200
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "three_platform_demo_v1",
+    "currency": "USD",
+    "other_fees": [],
+    "price_complete": true,
+    "offers": [
+      {
+        "description": "Simulated BOGO included in bundle subtotal; do not subtract again.",
+        "applied": true,
+        "eligibility_status": "confirmed"
+      }
+    ],
+    "eta_min_minutes": 35,
+    "eta_max_minutes": 35,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "Additional simulated platform comparison, not supplied by a platform. Bundle price already includes BOGO. Tax assumption: 9% of discounted item subtotal, rounded to cents. Includes the same $2 tip as other scenarios. Ingredients, dietary and allergy information are demo assertions, not independently verified. Restaurant delivery availability is hypothetical.",
+    "dietary_tags": [
+      "vegan",
+      "vegetarian",
+      "gluten-aware"
+    ],
+    "subtotal_cents": 1200,
+    "delivery_fee_cents": 149,
+    "service_fee_cents": 125,
+    "tax_cents": 108,
+    "tax_and_fees_combined_cents": null,
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 1782,
+    "source_offer": {
+      "id": "p9",
+      "provider": "grubhub",
+      "restaurant": "Masa Verde",
+      "item": "Black bean taco duo BOGO",
+      "cuisine": "mexican",
+      "foods": [
+        "tacos"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "ingredients": [
+        "black bean",
+        "corn",
+        "tomato",
+        "onion",
+        "cilantro"
+      ],
+      "allergens": [],
+      "mayContain": [],
+      "ingredientInfoComplete": true,
+      "allergyInfoComplete": true,
+      "price": 11,
+      "originalPrice": 22,
+      "deliveryFee": 0,
+      "serviceFee": 0.5,
+      "taxRate": 0.09,
+      "servings": 2,
+      "etaMinutes": 30,
+      "deals": [
+        "bogo",
+        "discount",
+        "free-delivery"
+      ],
+      "minimumOrder": 0,
+      "newCustomerOnly": false,
+      "available": true,
+      "location": "Mountain View",
+      "description": "Simulated BOGO taco meals for two, with free delivery."
+    }
+  },
+  {
+    "comparison_key": "bogo_p9",
+    "restaurant": {
+      "restaurant_id": "user_masa_verde",
+      "name": "Masa Verde",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location",
+    "platform": "doordash",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Black bean taco duo BOGO",
+        "quantity": 1,
+        "size": "BOGO bundle \u00b7 serves 2",
+        "modifiers": [],
+        "unit_price_cents": 1300,
+        "line_total_cents": 1300
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "three_platform_demo_v1",
+    "currency": "USD",
+    "other_fees": [],
+    "price_complete": true,
+    "offers": [
+      {
+        "description": "Simulated BOGO included in bundle subtotal; do not subtract again.",
+        "applied": true,
+        "eligibility_status": "confirmed"
+      }
+    ],
+    "eta_min_minutes": 40,
+    "eta_max_minutes": 40,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "Additional simulated platform comparison, not supplied by a platform. Bundle price already includes BOGO. Tax assumption: 9% of discounted item subtotal, rounded to cents. Includes the same $2 tip as other scenarios. Ingredients, dietary and allergy information are demo assertions, not independently verified. Restaurant delivery availability is hypothetical.",
+    "dietary_tags": [
+      "vegan",
+      "vegetarian",
+      "gluten-aware"
+    ],
+    "subtotal_cents": 1300,
+    "delivery_fee_cents": 149,
+    "service_fee_cents": 125,
+    "tax_cents": 117,
+    "tax_and_fees_combined_cents": null,
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 1891,
+    "source_offer": {
+      "id": "p9",
+      "provider": "grubhub",
+      "restaurant": "Masa Verde",
+      "item": "Black bean taco duo BOGO",
+      "cuisine": "mexican",
+      "foods": [
+        "tacos"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "ingredients": [
+        "black bean",
+        "corn",
+        "tomato",
+        "onion",
+        "cilantro"
+      ],
+      "allergens": [],
+      "mayContain": [],
+      "ingredientInfoComplete": true,
+      "allergyInfoComplete": true,
+      "price": 11,
+      "originalPrice": 22,
+      "deliveryFee": 0,
+      "serviceFee": 0.5,
+      "taxRate": 0.09,
+      "servings": 2,
+      "etaMinutes": 30,
+      "deals": [
+        "bogo",
+        "discount",
+        "free-delivery"
+      ],
+      "minimumOrder": 0,
+      "newCustomerOnly": false,
+      "available": true,
+      "location": "Mountain View",
+      "description": "Simulated BOGO taco meals for two, with free delivery."
+    }
+  },
+  {
+    "comparison_key": "bogo_p9",
+    "restaurant": {
+      "restaurant_id": "user_masa_verde",
+      "name": "Masa Verde",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location",
+    "platform": "restaurant_direct",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Black bean taco duo BOGO",
+        "quantity": 1,
+        "size": "BOGO bundle \u00b7 serves 2",
+        "modifiers": [],
+        "unit_price_cents": 1400,
+        "line_total_cents": 1400
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "three_platform_demo_v1",
+    "currency": "USD",
+    "other_fees": [],
+    "price_complete": true,
+    "offers": [
+      {
+        "description": "Simulated BOGO included in bundle subtotal; do not subtract again.",
+        "applied": true,
+        "eligibility_status": "confirmed"
+      }
+    ],
+    "eta_min_minutes": 45,
+    "eta_max_minutes": 45,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "Additional simulated platform comparison, not supplied by a platform. Bundle price already includes BOGO. Tax assumption: 9% of discounted item subtotal, rounded to cents. Includes the same $2 tip as other scenarios. Ingredients, dietary and allergy information are demo assertions, not independently verified. Restaurant delivery availability is hypothetical.",
+    "dietary_tags": [
+      "vegan",
+      "vegetarian",
+      "gluten-aware"
+    ],
+    "subtotal_cents": 1400,
+    "delivery_fee_cents": 299,
+    "service_fee_cents": 0,
+    "tax_cents": 126,
+    "tax_and_fees_combined_cents": null,
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 2025,
+    "source_offer": {
+      "id": "p9",
+      "provider": "grubhub",
+      "restaurant": "Masa Verde",
+      "item": "Black bean taco duo BOGO",
+      "cuisine": "mexican",
+      "foods": [
+        "tacos"
+      ],
+      "dietary": [
+        "vegan",
+        "vegetarian",
+        "gluten-free",
+        "dairy-free"
+      ],
+      "ingredients": [
+        "black bean",
+        "corn",
+        "tomato",
+        "onion",
+        "cilantro"
+      ],
+      "allergens": [],
+      "mayContain": [],
+      "ingredientInfoComplete": true,
+      "allergyInfoComplete": true,
+      "price": 11,
+      "originalPrice": 22,
+      "deliveryFee": 0,
+      "serviceFee": 0.5,
+      "taxRate": 0.09,
+      "servings": 2,
+      "etaMinutes": 30,
+      "deals": [
+        "bogo",
+        "discount",
+        "free-delivery"
+      ],
+      "minimumOrder": 0,
+      "newCustomerOnly": false,
+      "available": true,
+      "location": "Mountain View",
+      "description": "Simulated BOGO taco meals for two, with free delivery."
+    }
+  },
+  {
+    "comparison_key": "bogo_p6",
+    "restaurant": {
+      "restaurant_id": "user_piazza_kitchen",
+      "name": "Piazza Kitchen",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location",
+    "platform": "grubhub",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Margherita pizza BOGO",
+        "quantity": 1,
+        "size": "BOGO bundle \u00b7 serves 4",
+        "modifiers": [],
+        "unit_price_cents": 1600,
+        "line_total_cents": 1600
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "three_platform_demo_v1",
+    "currency": "USD",
+    "other_fees": [],
+    "price_complete": true,
+    "offers": [
+      {
+        "description": "Simulated BOGO included in bundle subtotal; do not subtract again.",
+        "applied": true,
+        "eligibility_status": "confirmed"
+      }
+    ],
+    "eta_min_minutes": 40,
+    "eta_max_minutes": 40,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "User-provided simulated offer. Bundle price already includes BOGO. Tax assumption: 9% of discounted item subtotal, rounded to cents. Includes the same $2 tip as other scenarios. Ingredients, dietary and allergy information are demo assertions, not independently verified. Restaurant delivery availability is hypothetical.",
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "subtotal_cents": 1600,
+    "delivery_fee_cents": 200,
+    "service_fee_cents": 50,
+    "tax_cents": 144,
+    "tax_and_fees_combined_cents": null,
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 2194,
+    "source_offer": {
+      "id": "p6",
+      "provider": "grubhub",
+      "restaurant": "Piazza Kitchen",
+      "item": "Margherita pizza BOGO",
+      "cuisine": "italian",
+      "foods": [
+        "pizza"
+      ],
+      "dietary": [
+        "vegetarian"
+      ],
+      "ingredients": [
+        "wheat",
+        "milk",
+        "tomato",
+        "basil"
+      ],
+      "allergens": [
+        "wheat",
+        "milk"
+      ],
+      "mayContain": [],
+      "ingredientInfoComplete": true,
+      "allergyInfoComplete": true,
+      "price": 16,
+      "originalPrice": 32,
+      "deliveryFee": 2,
+      "serviceFee": 0.5,
+      "taxRate": 0.09,
+      "servings": 4,
+      "etaMinutes": 40,
+      "deals": [
+        "bogo",
+        "discount"
+      ],
+      "minimumOrder": 0,
+      "newCustomerOnly": false,
+      "available": true,
+      "location": "Mountain View",
+      "description": "Simulated two-pizza bundle; serves four."
+    }
+  },
+  {
+    "comparison_key": "bogo_p6",
+    "restaurant": {
+      "restaurant_id": "user_piazza_kitchen",
+      "name": "Piazza Kitchen",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location",
+    "platform": "ubereats",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Margherita pizza BOGO",
+        "quantity": 1,
+        "size": "BOGO bundle \u00b7 serves 4",
+        "modifiers": [],
+        "unit_price_cents": 1700,
+        "line_total_cents": 1700
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "three_platform_demo_v1",
+    "currency": "USD",
+    "other_fees": [],
+    "price_complete": true,
+    "offers": [
+      {
+        "description": "Simulated BOGO included in bundle subtotal; do not subtract again.",
+        "applied": true,
+        "eligibility_status": "confirmed"
+      }
+    ],
+    "eta_min_minutes": 45,
+    "eta_max_minutes": 45,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "Additional simulated platform comparison, not supplied by a platform. Bundle price already includes BOGO. Tax assumption: 9% of discounted item subtotal, rounded to cents. Includes the same $2 tip as other scenarios. Ingredients, dietary and allergy information are demo assertions, not independently verified. Restaurant delivery availability is hypothetical.",
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "subtotal_cents": 1700,
+    "delivery_fee_cents": 149,
+    "service_fee_cents": 125,
+    "tax_cents": 153,
+    "tax_and_fees_combined_cents": null,
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 2327,
+    "source_offer": {
+      "id": "p6",
+      "provider": "grubhub",
+      "restaurant": "Piazza Kitchen",
+      "item": "Margherita pizza BOGO",
+      "cuisine": "italian",
+      "foods": [
+        "pizza"
+      ],
+      "dietary": [
+        "vegetarian"
+      ],
+      "ingredients": [
+        "wheat",
+        "milk",
+        "tomato",
+        "basil"
+      ],
+      "allergens": [
+        "wheat",
+        "milk"
+      ],
+      "mayContain": [],
+      "ingredientInfoComplete": true,
+      "allergyInfoComplete": true,
+      "price": 16,
+      "originalPrice": 32,
+      "deliveryFee": 2,
+      "serviceFee": 0.5,
+      "taxRate": 0.09,
+      "servings": 4,
+      "etaMinutes": 40,
+      "deals": [
+        "bogo",
+        "discount"
+      ],
+      "minimumOrder": 0,
+      "newCustomerOnly": false,
+      "available": true,
+      "location": "Mountain View",
+      "description": "Simulated two-pizza bundle; serves four."
+    }
+  },
+  {
+    "comparison_key": "bogo_p6",
+    "restaurant": {
+      "restaurant_id": "user_piazza_kitchen",
+      "name": "Piazza Kitchen",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location",
+    "platform": "doordash",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Margherita pizza BOGO",
+        "quantity": 1,
+        "size": "BOGO bundle \u00b7 serves 4",
+        "modifiers": [],
+        "unit_price_cents": 1800,
+        "line_total_cents": 1800
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "three_platform_demo_v1",
+    "currency": "USD",
+    "other_fees": [],
+    "price_complete": true,
+    "offers": [
+      {
+        "description": "Simulated BOGO included in bundle subtotal; do not subtract again.",
+        "applied": true,
+        "eligibility_status": "confirmed"
+      }
+    ],
+    "eta_min_minutes": 50,
+    "eta_max_minutes": 50,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "Additional simulated platform comparison, not supplied by a platform. Bundle price already includes BOGO. Tax assumption: 9% of discounted item subtotal, rounded to cents. Includes the same $2 tip as other scenarios. Ingredients, dietary and allergy information are demo assertions, not independently verified. Restaurant delivery availability is hypothetical.",
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "subtotal_cents": 1800,
+    "delivery_fee_cents": 149,
+    "service_fee_cents": 125,
+    "tax_cents": 162,
+    "tax_and_fees_combined_cents": null,
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 2436,
+    "source_offer": {
+      "id": "p6",
+      "provider": "grubhub",
+      "restaurant": "Piazza Kitchen",
+      "item": "Margherita pizza BOGO",
+      "cuisine": "italian",
+      "foods": [
+        "pizza"
+      ],
+      "dietary": [
+        "vegetarian"
+      ],
+      "ingredients": [
+        "wheat",
+        "milk",
+        "tomato",
+        "basil"
+      ],
+      "allergens": [
+        "wheat",
+        "milk"
+      ],
+      "mayContain": [],
+      "ingredientInfoComplete": true,
+      "allergyInfoComplete": true,
+      "price": 16,
+      "originalPrice": 32,
+      "deliveryFee": 2,
+      "serviceFee": 0.5,
+      "taxRate": 0.09,
+      "servings": 4,
+      "etaMinutes": 40,
+      "deals": [
+        "bogo",
+        "discount"
+      ],
+      "minimumOrder": 0,
+      "newCustomerOnly": false,
+      "available": true,
+      "location": "Mountain View",
+      "description": "Simulated two-pizza bundle; serves four."
+    }
+  },
+  {
+    "comparison_key": "bogo_p6",
+    "restaurant": {
+      "restaurant_id": "user_piazza_kitchen",
+      "name": "Piazza Kitchen",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location",
+    "platform": "restaurant_direct",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Margherita pizza BOGO",
+        "quantity": 1,
+        "size": "BOGO bundle \u00b7 serves 4",
+        "modifiers": [],
+        "unit_price_cents": 1900,
+        "line_total_cents": 1900
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "three_platform_demo_v1",
+    "currency": "USD",
+    "other_fees": [],
+    "price_complete": true,
+    "offers": [
+      {
+        "description": "Simulated BOGO included in bundle subtotal; do not subtract again.",
+        "applied": true,
+        "eligibility_status": "confirmed"
+      }
+    ],
+    "eta_min_minutes": 55,
+    "eta_max_minutes": 55,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "Additional simulated platform comparison, not supplied by a platform. Bundle price already includes BOGO. Tax assumption: 9% of discounted item subtotal, rounded to cents. Includes the same $2 tip as other scenarios. Ingredients, dietary and allergy information are demo assertions, not independently verified. Restaurant delivery availability is hypothetical.",
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "subtotal_cents": 1900,
+    "delivery_fee_cents": 299,
+    "service_fee_cents": 0,
+    "tax_cents": 171,
+    "tax_and_fees_combined_cents": null,
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 2570,
+    "source_offer": {
+      "id": "p6",
+      "provider": "grubhub",
+      "restaurant": "Piazza Kitchen",
+      "item": "Margherita pizza BOGO",
+      "cuisine": "italian",
+      "foods": [
+        "pizza"
+      ],
+      "dietary": [
+        "vegetarian"
+      ],
+      "ingredients": [
+        "wheat",
+        "milk",
+        "tomato",
+        "basil"
+      ],
+      "allergens": [
+        "wheat",
+        "milk"
+      ],
+      "mayContain": [],
+      "ingredientInfoComplete": true,
+      "allergyInfoComplete": true,
+      "price": 16,
+      "originalPrice": 32,
+      "deliveryFee": 2,
+      "serviceFee": 0.5,
+      "taxRate": 0.09,
+      "servings": 4,
+      "etaMinutes": 40,
+      "deals": [
+        "bogo",
+        "discount"
+      ],
+      "minimumOrder": 0,
+      "newCustomerOnly": false,
+      "available": true,
+      "location": "Mountain View",
+      "description": "Simulated two-pizza bundle; serves four."
+    }
+  },
+  {
+    "comparison_key": "bogo_p1",
+    "restaurant": {
+      "restaurant_id": "user_little_hunan",
+      "name": "Little Hunan",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location",
+    "platform": "ubereats",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Vegetable Chow Fun BOGO",
+        "quantity": 1,
+        "size": "BOGO bundle \u00b7 serves 2",
+        "modifiers": [],
+        "unit_price_cents": 1250,
+        "line_total_cents": 1250
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "three_platform_demo_v1",
+    "currency": "USD",
+    "other_fees": [],
+    "price_complete": true,
+    "offers": [
+      {
+        "description": "Simulated BOGO included in bundle subtotal; do not subtract again.",
+        "applied": true,
+        "eligibility_status": "confirmed"
+      }
+    ],
+    "eta_min_minutes": 35,
+    "eta_max_minutes": 35,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "User-provided simulated offer. Bundle price already includes BOGO. Tax assumption: 9% of discounted item subtotal, rounded to cents. Includes the same $2 tip as other scenarios. Ingredients, dietary and allergy information are demo assertions, not independently verified. Restaurant delivery availability is hypothetical.",
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "subtotal_cents": 1250,
+    "delivery_fee_cents": 0,
+    "service_fee_cents": 50,
+    "tax_cents": 113,
+    "tax_and_fees_combined_cents": null,
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 1613,
+    "source_offer": {
+      "id": "p1",
+      "provider": "uber-eats",
+      "restaurant": "Little Hunan",
+      "item": "Vegetable Chow Fun BOGO",
+      "cuisine": "chinese",
+      "foods": [
+        "noodles"
+      ],
+      "dietary": [
+        "vegetarian"
+      ],
+      "ingredients": [
+        "rice noodles",
+        "soy",
+        "wheat",
+        "onion",
+        "mushroom",
+        "egg"
+      ],
+      "allergens": [
+        "soy",
+        "wheat",
+        "egg"
+      ],
+      "mayContain": [
+        "peanut"
+      ],
+      "ingredientInfoComplete": true,
+      "allergyInfoComplete": true,
+      "price": 12.5,
+      "originalPrice": 25,
+      "deliveryFee": 0,
+      "serviceFee": 0.5,
+      "taxRate": 0.09,
+      "servings": 2,
+      "etaMinutes": 35,
+      "deals": [
+        "bogo",
+        "discount",
+        "free-delivery"
+      ],
+      "minimumOrder": 0,
+      "newCustomerOnly": false,
+      "available": true,
+      "location": "Mountain View",
+      "description": "Simulated buy-one-get-one offer: two portions included in the bundle price."
+    }
+  },
+  {
+    "comparison_key": "bogo_p1",
+    "restaurant": {
+      "restaurant_id": "user_little_hunan",
+      "name": "Little Hunan",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location",
+    "platform": "doordash",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Vegetable Chow Fun BOGO",
+        "quantity": 1,
+        "size": "BOGO bundle \u00b7 serves 2",
+        "modifiers": [],
+        "unit_price_cents": 1350,
+        "line_total_cents": 1350
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "three_platform_demo_v1",
+    "currency": "USD",
+    "other_fees": [],
+    "price_complete": true,
+    "offers": [
+      {
+        "description": "Simulated BOGO included in bundle subtotal; do not subtract again.",
+        "applied": true,
+        "eligibility_status": "confirmed"
+      }
+    ],
+    "eta_min_minutes": 40,
+    "eta_max_minutes": 40,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "Additional simulated platform comparison, not supplied by a platform. Bundle price already includes BOGO. Tax assumption: 9% of discounted item subtotal, rounded to cents. Includes the same $2 tip as other scenarios. Ingredients, dietary and allergy information are demo assertions, not independently verified. Restaurant delivery availability is hypothetical.",
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "subtotal_cents": 1350,
+    "delivery_fee_cents": 149,
+    "service_fee_cents": 125,
+    "tax_cents": 122,
+    "tax_and_fees_combined_cents": null,
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 1946,
+    "source_offer": {
+      "id": "p1",
+      "provider": "uber-eats",
+      "restaurant": "Little Hunan",
+      "item": "Vegetable Chow Fun BOGO",
+      "cuisine": "chinese",
+      "foods": [
+        "noodles"
+      ],
+      "dietary": [
+        "vegetarian"
+      ],
+      "ingredients": [
+        "rice noodles",
+        "soy",
+        "wheat",
+        "onion",
+        "mushroom",
+        "egg"
+      ],
+      "allergens": [
+        "soy",
+        "wheat",
+        "egg"
+      ],
+      "mayContain": [
+        "peanut"
+      ],
+      "ingredientInfoComplete": true,
+      "allergyInfoComplete": true,
+      "price": 12.5,
+      "originalPrice": 25,
+      "deliveryFee": 0,
+      "serviceFee": 0.5,
+      "taxRate": 0.09,
+      "servings": 2,
+      "etaMinutes": 35,
+      "deals": [
+        "bogo",
+        "discount",
+        "free-delivery"
+      ],
+      "minimumOrder": 0,
+      "newCustomerOnly": false,
+      "available": true,
+      "location": "Mountain View",
+      "description": "Simulated buy-one-get-one offer: two portions included in the bundle price."
+    }
+  },
+  {
+    "comparison_key": "bogo_p1",
+    "restaurant": {
+      "restaurant_id": "user_little_hunan",
+      "name": "Little Hunan",
+      "address": null,
+      "city": "Mountain View",
+      "state": "CA"
+    },
+    "location_id": "mv_demo_location",
+    "platform": "restaurant_direct",
+    "platform_store_url": null,
+    "platform_items": [
+      {
+        "item_name": "Vegetable Chow Fun BOGO",
+        "quantity": 1,
+        "size": "BOGO bundle \u00b7 serves 2",
+        "modifiers": [],
+        "unit_price_cents": 1450,
+        "line_total_cents": 1450
+      }
+    ],
+    "fulfillment": "delivery",
+    "delivery_speed": "standard",
+    "membership": "none",
+    "customer_status": "existing",
+    "account_context_id": "three_platform_demo_v1",
+    "currency": "USD",
+    "other_fees": [],
+    "price_complete": true,
+    "offers": [
+      {
+        "description": "Simulated BOGO included in bundle subtotal; do not subtract again.",
+        "applied": true,
+        "eligibility_status": "confirmed"
+      }
+    ],
+    "eta_min_minutes": 45,
+    "eta_max_minutes": 45,
+    "availability": "available",
+    "data_type": "synthetic",
+    "captured_at": null,
+    "evidence_paths": [],
+    "verification_status": "unreviewed",
+    "missing_fields": [],
+    "notes": "Additional simulated platform comparison, not supplied by a platform. Bundle price already includes BOGO. Tax assumption: 9% of discounted item subtotal, rounded to cents. Includes the same $2 tip as other scenarios. Ingredients, dietary and allergy information are demo assertions, not independently verified. Restaurant delivery availability is hypothetical.",
+    "dietary_tags": [
+      "vegetarian"
+    ],
+    "subtotal_cents": 1450,
+    "delivery_fee_cents": 299,
+    "service_fee_cents": 0,
+    "tax_cents": 131,
+    "tax_and_fees_combined_cents": null,
+    "tip_cents": 200,
+    "additional_discount_cents": 0,
+    "displayed_total_cents": 2080,
+    "source_offer": {
+      "id": "p1",
+      "provider": "uber-eats",
+      "restaurant": "Little Hunan",
+      "item": "Vegetable Chow Fun BOGO",
+      "cuisine": "chinese",
+      "foods": [
+        "noodles"
+      ],
+      "dietary": [
+        "vegetarian"
+      ],
+      "ingredients": [
+        "rice noodles",
+        "soy",
+        "wheat",
+        "onion",
+        "mushroom",
+        "egg"
+      ],
+      "allergens": [
+        "soy",
+        "wheat",
+        "egg"
+      ],
+      "mayContain": [
+        "peanut"
+      ],
+      "ingredientInfoComplete": true,
+      "allergyInfoComplete": true,
+      "price": 12.5,
+      "originalPrice": 25,
+      "deliveryFee": 0,
+      "serviceFee": 0.5,
+      "taxRate": 0.09,
+      "servings": 2,
+      "etaMinutes": 35,
+      "deals": [
+        "bogo",
+        "discount",
+        "free-delivery"
+      ],
+      "minimumOrder": 0,
+      "newCustomerOnly": false,
+      "available": true,
+      "location": "Mountain View",
+      "description": "Simulated buy-one-get-one offer: two portions included in the bundle price."
+    }
+  }
+]

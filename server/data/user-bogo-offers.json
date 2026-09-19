@@ -1,0 +1,136 @@
+[
+  {
+    "id": "p9",
+    "provider": "grubhub",
+    "restaurant": "Masa Verde",
+    "item": "Black bean taco duo BOGO",
+    "cuisine": "mexican",
+    "foods": [
+      "tacos"
+    ],
+    "dietary": [
+      "vegan",
+      "vegetarian",
+      "gluten-free",
+      "dairy-free"
+    ],
+    "ingredients": [
+      "black bean",
+      "corn",
+      "tomato",
+      "onion",
+      "cilantro"
+    ],
+    "allergens": [],
+    "mayContain": [],
+    "ingredientInfoComplete": true,
+    "allergyInfoComplete": true,
+    "price": 11,
+    "originalPrice": 22,
+    "deliveryFee": 0,
+    "serviceFee": 0.5,
+    "taxRate": 0.09,
+    "servings": 2,
+    "etaMinutes": 30,
+    "deals": [
+      "bogo",
+      "discount",
+      "free-delivery"
+    ],
+    "minimumOrder": 0,
+    "newCustomerOnly": false,
+    "available": true,
+    "location": "Mountain View",
+    "description": "Simulated BOGO taco meals for two, with free delivery."
+  },
+  {
+    "id": "p6",
+    "provider": "grubhub",
+    "restaurant": "Piazza Kitchen",
+    "item": "Margherita pizza BOGO",
+    "cuisine": "italian",
+    "foods": [
+      "pizza"
+    ],
+    "dietary": [
+      "vegetarian"
+    ],
+    "ingredients": [
+      "wheat",
+      "milk",
+      "tomato",
+      "basil"
+    ],
+    "allergens": [
+      "wheat",
+      "milk"
+    ],
+    "mayContain": [],
+    "ingredientInfoComplete": true,
+    "allergyInfoComplete": true,
+    "price": 16,
+    "originalPrice": 32,
+    "deliveryFee": 2,
+    "serviceFee": 0.5,
+    "taxRate": 0.09,
+    "servings": 4,
+    "etaMinutes": 40,
+    "deals": [
+      "bogo",
+      "discount"
+    ],
+    "minimumOrder": 0,
+    "newCustomerOnly": false,
+    "available": true,
+    "location": "Mountain View",
+    "description": "Simulated two-pizza bundle; serves four."
+  },
+  {
+    "id": "p1",
+    "provider": "uber-eats",
+    "restaurant": "Little Hunan",
+    "item": "Vegetable Chow Fun BOGO",
+    "cuisine": "chinese",
+    "foods": [
+      "noodles"
+    ],
+    "dietary": [
+      "vegetarian"
+    ],
+    "ingredients": [
+      "rice noodles",
+      "soy",
+      "wheat",
+      "onion",
+      "mushroom",
+      "egg"
+    ],
+    "allergens": [
+      "soy",
+      "wheat",
+      "egg"
+    ],
+    "mayContain": [
+      "peanut"
+    ],
+    "ingredientInfoComplete": true,
+    "allergyInfoComplete": true,
+    "price": 12.5,
+    "originalPrice": 25,
+    "deliveryFee": 0,
+    "serviceFee": 0.5,
+    "taxRate": 0.09,
+    "servings": 2,
+    "etaMinutes": 35,
+    "deals": [
+      "bogo",
+      "discount",
+      "free-delivery"
+    ],
+    "minimumOrder": 0,
+    "newCustomerOnly": false,
+    "available": true,
+    "location": "Mountain View",
+    "description": "Simulated buy-one-get-one offer: two portions included in the bundle price."
+  }
+]

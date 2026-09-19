@@ -11,6 +11,19 @@ import { baseIntent } from '../agent/intent.js';
 const [quote] = JSON.parse(readFileSync(new URL('../data/quotes.json', import.meta.url), 'utf8'));
 const request = { message: 'rice', budget: 25, dietary: 'No preference' as const };
 
+test('incoming BOGO metadata supports agentic diet, cuisine and group filters', async () => {
+  const rows = JSON.parse(readFileSync(new URL('../data/bogo-demo-quotes.json', import.meta.url), 'utf8'));
+  const agent = new FoodAgent(new FoodIntentExtractor({ mode: 'local' }), [new DatabaseOfferProvider(async () => rows)]);
+  const result = await agent.run({ ...request, message: 'Vegan Mexican BOGO for two under $20' });
+  assert.equal(result.plan.options.length, 1);
+  assert.equal(result.plan.options[0].restaurant, 'Masa Verde');
+  assert.equal(result.plan.options[0].servings, 2);
+  assert.equal(result.plan.options[0].sourceOffer?.ingredientInfoComplete, true);
+  assert.ok(result.plan.options[0].total! <= 20);
+  const excluded = await agent.run({ ...request, message: 'No cilantro' }, result.context);
+  assert.equal(excluded.plan.options.length, 0);
+});
+
 test('database provider reads afresh and preserves stored totals without adding fees twice', async () => {
   let reads = 0;
   const provider = new DatabaseOfferProvider(async () => [{ ...quote, displayed_total_cents: ++reads === 1 ? 999 : 1099 }]);

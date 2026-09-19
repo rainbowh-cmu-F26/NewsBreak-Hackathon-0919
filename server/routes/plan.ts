@@ -2,10 +2,15 @@ import { Router } from 'express';
 import { readFileSync } from 'node:fs';
 import { quoteSchema } from '../../shared/quotes.js';
 import { buildPlan } from '../agent/localAgent.js';
-import { planRequestSchema } from '../../shared/schemas.js';
+import { planRequestSchema, type ChatRequest, type PlanResponse } from '../../shared/schemas.js';
 import { FoodAgent } from '../agent/foodAgent.js';
 
-export function createPlanRouter(agent = new FoodAgent()) {
+type PlanAgent = {
+  dataSource: PlanResponse['dataSource'];
+  run(request: ChatRequest): Promise<{ plan: PlanResponse }>;
+};
+
+export function createPlanRouter(agent: PlanAgent = new FoodAgent()) {
   const planRouter = Router();
   // Homepage browsing uses the existing demo catalog without AI interpretation.
   planRouter.post('/defaults', (_request, response, next) => {

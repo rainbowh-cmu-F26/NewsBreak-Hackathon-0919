@@ -11,13 +11,13 @@ const geminiResponseSchema = z.object({
 
 /** Native Gemini transport. Keys stay in server headers, never in URLs or client code. */
 export async function extractWithGemini(options: {
-  apiKey: string; model: string; input: string; schema: unknown; fetch: typeof fetch;
+  apiKey: string; model: string; input: string; schema: unknown; fetch: typeof fetch; instructions?: string; signal?: AbortSignal;
 }) {
   const response = await options.fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(options.model)}:generateContent`, {
-    method: 'POST', signal: AbortSignal.timeout(12_000),
+    method: 'POST', signal: options.signal ?? AbortSignal.timeout(12_000),
     headers: { 'x-goog-api-key': options.apiKey, 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      systemInstruction: { parts: [{ text: plannerInstructions }] },
+      systemInstruction: { parts: [{ text: options.instructions ?? plannerInstructions }] },
       contents: [{ role: 'user', parts: [{ text: options.input }] }],
       generationConfig: { responseMimeType: 'application/json', responseJsonSchema: options.schema, maxOutputTokens: 4096 },
     }),

@@ -1,6 +1,7 @@
 import type { DeliveryOption, PlanResponse } from '../../shared/schemas.js';
 import type { FoodIntent } from '../../shared/intent.js';
 import { catalogOfferSchema, type CatalogOffer, type OfferProvider } from '../providers/types.js';
+import { normalizeIntent } from './vocabulary.js';
 
 const cents = (value: number) => Math.round((value + Number.EPSILON) * 100);
 const money = (value: number) => cents(value) / 100;
@@ -14,6 +15,7 @@ export function appliedFilters(intent: FoodIntent): string[] {
   return [
     `Group budget: $${intent.budget.toFixed(2)}`, `${intent.servings} ${intent.servings === 1 ? 'person' : 'people'}`,
     ...intent.dietary, ...intent.cuisines, ...intent.foods,
+    ...[...(intent.preferredCuisines ?? []), ...(intent.preferredFoods ?? []), ...(intent.preferredDietary ?? [])].map((term) => `Prefer ${term}`),
     ...intent.excludedCuisines.map((value) => `No ${value} cuisine`),
     ...intent.excludedIngredients.map((value) => `No ${value}`),
     ...intent.allergens.map((value) => `Allergy: ${value}`),
@@ -44,6 +46,7 @@ function quote(offer: CatalogOffer, intent: FoodIntent, mock: boolean): Delivery
 }
 
 export function planOffers(intent: FoodIntent, rows: unknown[], mock = true, now = Date.now()): PlanResponse {
+  intent = normalizeIntent(intent);
   const eligible: { option: DeliveryOption; eta: number }[] = [];
   const seen = new Set<string>();
   for (const row of rows) {
@@ -69,6 +72,11 @@ export function planOffers(intent: FoodIntent, rows: unknown[], mock = true, now
     eligible.push({ option, eta: offer.etaMinutes });
   }
   eligible.sort((a, b) => {
+    const preferenceScore = (option: DeliveryOption) => Number((intent.preferredCuisines ?? []).includes(option.cuisine!))
+      + (intent.preferredFoods ?? []).filter((food) => contains(option.tags, food)).length
+      + (intent.preferredDietary ?? []).filter((diet) => option.tags.includes(diet)).length;
+    const preferenceDifference = preferenceScore(b.option) - preferenceScore(a.option);
+    if (preferenceDifference) return preferenceDifference;
     if (intent.sortBy === 'fastest') return a.eta - b.eta || a.option.total! - b.option.total!;
     if (intent.sortBy === 'cheapest') return a.option.total! - b.option.total! || a.eta - b.eta;
     return b.option.savings! - a.option.savings! || a.option.total! - b.option.total! || a.option.id.localeCompare(b.option.id);
@@ -109,5 +117,5 @@ export async function searchOffers(intent: FoodIntent, providers: OfferProvider[
   });
   const plan = planOffers(intent, rows, live.length === 0);
   if (!active.length || results.every((result) => result.status === 'rejected')) plan.summary = 'Offer search is unavailable. Please retry; no provider availability was confirmed.';
-  return { plan, warnings };
+  return { plan, warnings, rows, mock: live.length === 0 };
 }

@@ -9,6 +9,9 @@ export const intentSchema = z.object({
   budget: z.number().finite().positive().max(500),
   dietary: z.array(z.enum(dietaryValues)).max(6),
   cuisines: terms,
+  preferredCuisines: terms.default([]),
+  preferredFoods: terms.default([]),
+  preferredDietary: z.array(z.enum(dietaryValues)).max(6).default([]),
   excludedCuisines: terms,
   foods: terms,
   excludedIngredients: terms,
@@ -41,5 +44,6 @@ export const conversationContextSchema = z.object({
   formBudget: z.number(),
   formDietary: z.string(),
   lastBestTotal: z.number().nullable(),
+  recentTurns: z.array(z.object({ role: z.enum(['user', 'assistant']), content: z.string().max(3000) })).max(8).default([]),
 });
 export type ConversationContext = z.infer<typeof conversationContextSchema>;

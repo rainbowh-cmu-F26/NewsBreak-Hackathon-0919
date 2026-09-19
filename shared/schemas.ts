@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { agentDetailsSchema, providerValues } from './intent.js';
 
 export const planRequestSchema = z.object({
   prompt: z.string().trim().min(3, 'Describe what you want to eat.').max(160, 'Keep the craving under 160 characters.'),
@@ -22,6 +23,15 @@ export const deliveryOptionSchema = z.object({
   verified: z.boolean(),
   source: z.string(),
   verifiedAt: z.string(),
+  provider: z.enum(providerValues).optional(),
+  cuisine: z.string().optional(),
+  servings: z.number().int().positive().optional(),
+  quantity: z.number().int().positive().optional(),
+  total: z.number().nonnegative().optional(),
+  tax: z.number().nonnegative().optional(),
+  serviceFee: z.number().nonnegative().optional(),
+  savings: z.number().nonnegative().optional(),
+  priceNote: z.string().optional(),
 });
 
 export type DeliveryOption = z.infer<typeof deliveryOptionSchema>;
@@ -30,7 +40,8 @@ export const planResponseSchema = z.object({
   options: z.array(deliveryOptionSchema),
   savings: z.number().nonnegative(),
   checkedAt: z.string().datetime(),
-  dataSource: z.literal('verified-demo-data')
+  dataSource: z.enum(['verified-demo-data', 'provider-data']),
+  agent: agentDetailsSchema.optional(),
 });
 export type PlanResponse = z.infer<typeof planResponseSchema>;
 

@@ -1,6 +1,6 @@
 # MealWise
 
-MealWise is a delivery savings agent for low-income residents in Mountain View. It compares verified promotions, delivery fees, dietary fit, and ETAs to find the best total value for a specific budget.
+MealWise is a delivery savings agent for low-income residents in Mountain View. It interprets food requests, remembers follow-up preferences, and filters a simulated delivery catalog by diet, cuisine, budget, servings, deal type, provider, and ETA. Gemini and OpenAI interpretation are available; no live delivery providers are connected yet.
 
 ## Project structure
 
@@ -18,7 +18,8 @@ MealWise is a delivery savings agent for low-income residents in Mountain View. 
 ├── server/                 # Express API and local agent logic
 │   ├── agent/              # Prompt, ranking agent, and offer verification
 │   ├── db/                 # MongoDB persistence with local memory fallback
-│   ├── data/               # Verified demo offers
+│   ├── data/               # Simulated offer database
+│   ├── providers/          # Normalized offer contract and mock adapter
 │   ├── routes/             # HTTP endpoints
 │   ├── app.ts
 │   └── package.json
@@ -41,7 +42,7 @@ MealWise is a delivery savings agent for low-income residents in Mountain View. 
 
 ## Run locally
 
-Requirements: Node.js 20 or newer.
+Requirements: Node.js 22 or newer.
 
 ```bash
 npm install
@@ -76,7 +77,7 @@ Returns API availability and the active data source. The current response identi
 
 The response contains a ranked `options` list, total `savings`, a plain-language `summary`, a `checkedAt` timestamp, and `dataSource`. Each option includes its total price inputs, ETA, promotion detail, verification status, source, and verification timestamp. Requests are rejected with a useful `400` response when the craving, budget, or dietary preference is invalid.
 
-The current agent is deterministic and uses only schema-verified demo data. Ranking prioritizes dietary fit, prompt relevance, verified savings, and total cost. The `MODEL_API_KEY` placeholder in `.env.example` is ready for replacing the local ranking step with a hosted model after real provider tools are connected; provider results must still pass verification before ranking.
+The agent supports Gemini (`AI_PROVIDER=gemini`, `GEMINI_API_KEY`, `GEMINI_MODEL=gemini-3.5-flash-lite`) and OpenAI (`AI_PROVIDER=openai`, `OPENAI_API_KEY`) structured intent extraction. Auto mode uses the local parser if the selected provider has no key. Both paths use deterministic filtering and group quote calculations over the mock database. Set `AGENT_MODE=model` to require AI, or `local` to force offline operation. The UI shows the interpreted filters and active mode. See [the food agent guide](docs/food-agent.md) for setup, examples, limitations, and how to add authorized provider adapters.
 
 `POST /api/chat`
 
@@ -88,7 +89,7 @@ The current agent is deterministic and uses only schema-verified demo data. Rank
 }
 ```
 
-The response returns a `conversationId`, a concise agent `reply`, and the same ranked `plan` shape as the planner endpoint. Send the returned `conversationId` with later messages to keep the conversation associated in MongoDB. The chat panel uses the current budget and dietary controls from the planner.
+The response returns a `conversationId`, a concise agent `reply`, and the same ranked `plan` shape as the planner endpoint. Send the returned `conversationId` with later messages to reuse saved constraints. Chat messages can override form defaults; follow-ups preserve unmentioned preferences. Conversation state is stored in MongoDB or the disposable local store. Responses include `plan.agent` with interpreted intent, filters, mode, warnings, and any clarification question.
 
 ## Tests
 
@@ -104,7 +105,7 @@ For a built-in Node coverage summary, run `npm run test:coverage --workspace ser
 
 ## Continuous integration
 
-GitHub Actions runs on every branch push and pull request to `main` or `master`. The workflow installs with the lockfile, audits production dependencies, runs backend tests with coverage, typechecks the server, builds the frontend, and checks for whitespace errors. It does not require MongoDB because tests inject an in-memory test store.
+GitHub Actions runs on every branch push and pull request to `main` or `master`. The workflow installs with the lockfile, audits production dependencies, runs backend tests with coverage, typechecks the server, builds the frontend, and checks for whitespace errors. It does not require MongoDB or an OpenAI key because tests use local stores and mocked model responses.
 
 ## Security
 

@@ -33,3 +33,18 @@ export const planResponseSchema = z.object({
   dataSource: z.literal('verified-demo-data')
 });
 export type PlanResponse = z.infer<typeof planResponseSchema>;
+
+export const chatRequestSchema = z.object({
+  conversationId: z.string().uuid().optional(),
+  message: z.string().trim().min(3, 'Tell MealWise what you want to eat.').max(500, 'Keep your message under 500 characters.'),
+  budget: z.number().finite().positive().max(500),
+  dietary: planRequestSchema.shape.dietary
+}).strict();
+
+export type ChatRequest = z.infer<typeof chatRequestSchema>;
+export const chatResponseSchema = z.object({
+  conversationId: z.string().uuid(),
+  reply: z.string(),
+  plan: planResponseSchema
+});
+export type ChatResponse = z.infer<typeof chatResponseSchema>;

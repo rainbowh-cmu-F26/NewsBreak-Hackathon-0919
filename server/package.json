@@ -3,7 +3,24 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "scripts": { "dev": "tsx watch app.ts", "start": "tsx app.ts" },
-  "dependencies": { "cors": "^2.8.5", "express": "^4.21.2", "zod": "^3.24.1" },
-  "devDependencies": { "@types/cors": "^2.8.17", "@types/express": "^5.0.0", "tsx": "^4.19.2", "typescript": "^5.7.2" }
+  "scripts": {
+    "dev": "tsx watch app.ts",
+    "start": "tsx app.ts",
+    "test": "NODE_ENV=test tsx --test test/**/*.test.ts",
+    "test:coverage": "NODE_ENV=test node --import tsx --test --experimental-test-coverage test/**/*.test.ts"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "mongodb": "^7.6.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/supertest": "^7.2.1",
+    "supertest": "^7.2.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
 }

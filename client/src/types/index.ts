@@ -1,1 +1,1 @@
-export type { DeliveryOption, PlanRequest, PlanResponse } from '../../../shared/schemas';
+export type { ChatRequest, ChatResponse, DeliveryOption, PlanRequest, PlanResponse } from '../../../shared/schemas';

@@ -4,7 +4,7 @@ import request from 'supertest';
 import { createApp } from '../app.js';
 import { buildPlan } from '../agent/localAgent.js';
 import { createStore } from '../db/mongo.js';
-import type { ChatRequest, PlanResponse } from '../../shared/schemas.js';
+import { planResponseSchema, type ChatRequest, type PlanResponse } from '../../shared/schemas.js';
 import type { MealWiseStore } from '../db/mongo.js';
 
 class TestStore implements MealWiseStore {
@@ -94,4 +94,20 @@ test('keeps in-memory store for non-production without MongoDB URI', async () =>
     if (previousMongoUri === undefined) delete process.env.MONGODB_URI;
     else process.env.MONGODB_URI = previousMongoUri;
   }
+});
+
+
+test('homepage defaults return all 18 restaurants without calling the chat agent', async () => {
+  const store = new TestStore();
+  const agent = {
+    dataSource: 'verified-demo-data' as const,
+    run: async () => { throw new Error('Homepage must not depend on AI interpretation'); },
+  };
+  const response = await request(createApp(store, agent)).post('/api/plan/defaults').send({});
+  assert.equal(response.status, 200);
+  const plan = planResponseSchema.parse(response.body);
+  assert.equal(plan.options.length, 18);
+  assert.equal(new Set(plan.options.map(option => option.restaurant_id)).size, 18);
+  assert.ok(plan.options.every(option => option.restaurant && option.item && option.comparisons?.length));
+  assert.equal(store.turns.length, 0);
 });

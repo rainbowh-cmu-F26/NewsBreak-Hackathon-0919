@@ -1,10 +1,16 @@
 import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
-import { chatRequestSchema } from '../../shared/schemas.js';
+import { chatRequestSchema, type ChatRequest, type PlanResponse } from '../../shared/schemas.js';
+import type { ConversationContext } from '../../shared/intent.js';
 import type { MealWiseStore } from '../db/mongo.js';
 import { FoodAgent } from '../agent/foodAgent.js';
 
-export function createChatRouter(store: MealWiseStore, agent = new FoodAgent()) {
+type ChatAgent = {
+  dataSource: PlanResponse['dataSource'];
+  run(request: ChatRequest, previous?: ConversationContext | null): Promise<{ plan: PlanResponse; reply: string; context?: ConversationContext }>;
+};
+
+export function createChatRouter(store: MealWiseStore, agent: ChatAgent = new FoodAgent()) {
   const router = Router();
   router.post('/', async (request, response, next) => {
     const parsed = chatRequestSchema.safeParse(request.body);

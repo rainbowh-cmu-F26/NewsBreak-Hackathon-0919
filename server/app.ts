@@ -1,6 +1,9 @@
 import './env.js';
 import cors from 'cors';
 import express from 'express';
+import type { ChatRequest, PlanResponse } from '../shared/schemas.js';
+import type { ConversationContext } from '../shared/intent.js';
+import type { Quote } from '../shared/quotes.js';
 import type { MealWiseStore } from './db/mongo.js';
 import { createStore } from './db/mongo.js';
 import { rateLimit, securityHeaders } from './middleware/security.js';
@@ -9,10 +12,13 @@ import { createPlanRouter } from './routes/plan.js';
 import { FoodAgent } from './agent/foodAgent.js';
 import { buildPlan } from './agent/localAgent.js';
 
-type AppAgent = Pick<FoodAgent, 'run' | 'dataSource'>;
+type AppAgent = {
+	dataSource: PlanResponse['dataSource'];
+	run(request: ChatRequest, previous?: ConversationContext | null): Promise<{ plan: PlanResponse; reply: string; context?: ConversationContext }>;
+};
 
 export function createApp(store: MealWiseStore, agent?: AppAgent) {
-	const legacyStore = store as MealWiseStore & { listQuotes?: () => Promise<unknown[]>; getConversationContext?: (conversationId: string) => Promise<unknown>; };
+	const legacyStore = store as MealWiseStore & { listQuotes?: () => Promise<Quote[]>; getConversationContext?: (conversationId: string) => Promise<unknown>; };
 	const resolvedStore: MealWiseStore = typeof legacyStore.getConversationContext === 'function'
 		? store
 		: {
@@ -26,7 +32,7 @@ export function createApp(store: MealWiseStore, agent?: AppAgent) {
 			run: async (request) => {
 				const quotes = await legacyStore.listQuotes?.();
 				const plan = buildPlan({ prompt: request.message, budget: request.budget, dietary: request.dietary }, Array.isArray(quotes) ? quotes : undefined);
-				return { reply: plan.summary, plan, context: null };
+				return { reply: plan.summary, plan };
 			}
 		}
 		: new FoodAgent());

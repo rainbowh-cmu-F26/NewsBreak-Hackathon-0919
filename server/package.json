@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "tsx watch app.ts",
     "start": "tsx app.ts",
-    "test": "NODE_ENV=test tsx --test test/**/*.test.ts",
-    "test:coverage": "NODE_ENV=test node --import tsx --test --experimental-test-coverage test/**/*.test.ts"
+    "test": "node scripts/run-tests.mjs",
+    "test:coverage": "node scripts/run-tests.mjs --experimental-test-coverage"
   },
   "dependencies": {
     "cors": "^2.8.5",

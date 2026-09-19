@@ -39,6 +39,18 @@ test('persists chat turns and returns a plan', async () => {
   assert.equal(store.turns[0].request.message, 'Find a vegan dinner');
 });
 
+test('rejects malformed JSON and sends baseline security headers', async () => {
+  const response = await request(createApp(new TestStore()))
+    .post('/api/chat')
+    .set('Content-Type', 'application/json')
+    .send('{"message":');
+
+  assert.equal(response.status, 400);
+  assert.equal(response.body.error, 'Request body must be valid JSON.');
+  assert.equal(response.headers['x-content-type-options'], 'nosniff');
+  assert.equal(response.headers['x-frame-options'], 'DENY');
+});
+
 test('requires a CORS allowlist in production', () => {
   const previousNodeEnv = process.env.NODE_ENV;
   const previousCorsOrigin = process.env.CORS_ORIGIN;

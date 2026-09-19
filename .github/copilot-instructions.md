@@ -41,6 +41,8 @@ npm run build
 npm test --workspace server
 ```
 
+GitHub Actions runs the same checks on every branch push and pull request. Keep CI dependency installation lockfile-based with `npm ci`.
+
 For API changes, also start the server and smoke-test `POST /api/plan` with a representative budget and dietary filter. Confirm that invalid payloads return a useful 400 response and that returned totals stay within the requested budget.
 
 ## Deployment
@@ -50,3 +52,9 @@ For API changes, also start the server and smoke-test `POST /api/plan` with a re
 - Configure `VITE_API_URL` for the deployed client and `PORT` for the server.
 - Configure `CORS_ORIGIN` with the deployed client origin. The unset development fallback is permissive and must not be used in production.
 - Configure `MONGODB_URI` and `MONGODB_DATABASE` for production persistence.
+
+## Security
+
+- Preserve the production requirements for `CORS_ORIGIN` and `MONGODB_URI`.
+- Keep API input validation, rate limiting, security headers, and safe JSON error responses enabled.
+- Do not log or commit credentials, connection strings, or model provider keys.

@@ -8,6 +8,7 @@ import './styles.css';
 import './interaction-styles.css';
 
 const startingPlan: PlanResponse = { summary: 'Your shortlist will appear here.', options: [], savings: 0, checkedAt: new Date().toISOString(), dataSource: 'verified-demo-data' };
+const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8787';
 const quickSearches: Array<{ label: string } & PlanRequest> = [
   { label: 'Dinner for two', prompt: 'Dinner for two tonight', budget: 25, dietary: 'No preference' },
   { label: 'Vegetarian lunch', prompt: 'A filling vegetarian lunch', budget: 18, dietary: 'Vegetarian' },
@@ -48,7 +49,8 @@ function App() {
   }
 
   function applyQuickSearch(search: typeof quickSearches[number]) {
-    setPrompt(search.prompt); setBudget(search.budget); setDietary(search.dietary); void submit(undefined, search);
+    const request: PlanRequest = { prompt: search.prompt, budget: search.budget, dietary: search.dietary };
+    setPrompt(search.prompt); setBudget(search.budget); setDietary(search.dietary); void submit(undefined, request);
   }
 
   function toggleSaved(id: string) {
@@ -67,7 +69,7 @@ function App() {
       </section>
       {chatOpen && <ChatPanel budget={budget} dietary={dietary} onPlan={(response) => { setPlan(response.plan); setShowSavedOnly(false); window.requestAnimationFrame(() => document.getElementById('shortlist')?.scrollIntoView({ behavior: 'smooth', block: 'start' })); }} />}
       <section className="results" id="shortlist"><div className="results-header"><div><p className="section-kicker">02 / Your shortlist</p><h2>{showSavedOnly ? 'Saved for later' : 'Best value, right now'}</h2></div>{plan.options.length > 0 && !showSavedOnly && <div className="savings-pill">You save <strong>${plan.savings.toFixed(2)}</strong></div>}</div>{error && <div className="error-message"><span>{error}</span><button onClick={() => void submit()}>Try again <ArrowRight size={14} /></button></div>}{loading ? <div className="loading-grid">{[1, 2, 3].map((item) => <div className="loading-card" key={item}><span /><span /><span /><span /></div>)}</div> : visibleOptions.length === 0 ? <div className="empty-state"><Utensils size={25} /><p>{showSavedOnly ? 'No saved offers from this shortlist yet.' : plan.summary}</p><span>{showSavedOnly ? 'Tap the heart on a deal to keep it nearby.' : 'Set your budget and let’s find something good.'}</span>{showSavedOnly && <button className="text-button" onClick={() => setShowSavedOnly(false)}>Back to shortlist <ArrowRight size={14} /></button>}</div> : <><p className="result-summary">{plan.summary} <span className="checked-note"><Check size={13} /> Checked just now</span></p><div className="offer-grid">{visibleOptions.map((option, index) => <OfferCard key={option.id} option={option} index={index} saved={savedIds.includes(option.id)} onSave={() => toggleSaved(option.id)} onView={() => setSelectedOffer(option)} />)}</div></>}</section>
-    </main><footer><span>mealwise / a Mountain View delivery guide</span><span>Built for everyday budgets <span className="footer-dot">•</span> <a href="http://localhost:8787/health">System status</a></span></footer>
+    </main><footer><span>mealwise / a Mountain View delivery guide</span><span>Built for everyday budgets <span className="footer-dot">•</span> <a href={`${apiBaseUrl}/health`}>System status</a></span></footer>
     {selectedOffer && <OfferDialog offer={selectedOffer} saved={savedIds.includes(selectedOffer.id)} onSave={() => toggleSaved(selectedOffer.id)} onClose={() => setSelectedOffer(null)} />}{toast && <div className="toast" role="status"><Check size={16} /> {toast}</div>}
   </div>;
 }

@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const dietaryValues = ['vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'halal', 'kosher'] as const;
 export const dealValues = ['bogo', 'discount', 'free-delivery'] as const;
-export const providerValues = ['uber-eats', 'doordash', 'grubhub'] as const;
+export const providerValues = ['uber-eats', 'doordash', 'grubhub', 'restaurant-direct'] as const;
 const terms = z.array(z.string().trim().min(1).max(60)).max(15);
 
 export const intentSchema = z.object({

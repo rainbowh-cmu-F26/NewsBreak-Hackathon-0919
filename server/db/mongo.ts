@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { MongoClient, type Collection } from 'mongodb';
 import type { ChatRequest, PlanResponse } from '../../shared/schemas.js';
 import { conversationContextSchema, type ConversationContext } from '../../shared/intent.js';
+import type { FoodIntent } from '../../shared/intent.js';
 
 type StoredPlan = {
   _id?: string;
@@ -21,6 +22,7 @@ type StoredMessage = {
 };
 
 export interface MealWiseStore {
+  listQuotes?(intent?: FoodIntent, signal?: AbortSignal): Promise<unknown[]>;
   getConversationContext(conversationId: string): Promise<ConversationContext | null>;
   saveConversationTurn(conversationId: string, request: ChatRequest, reply: string, plan: PlanResponse, context?: ConversationContext): Promise<void>;
   close(): Promise<void>;
@@ -52,8 +54,16 @@ class MongoStore implements MealWiseStore {
   constructor(
     private readonly client: MongoClient,
     private readonly messages: Collection<StoredMessage>,
-    private readonly plans: Collection<StoredPlan>
+    private readonly plans: Collection<StoredPlan>,
+    private readonly quotes: Collection
   ) {}
+
+  async listQuotes(intent?: FoodIntent, signal?: AbortSignal) {
+    signal?.throwIfAborted();
+    const location = intent?.location;
+    const query = location ? { 'restaurant.city': { $regex: `^${location.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, $options: 'i' } } : {};
+    return this.quotes.find(query, { projection: { _id: 0 }, maxTimeMS: 4000, signal }).toArray();
+  }
 
   async getConversationContext(conversationId: string) {
     const saved = await this.plans.findOne({ conversationId }, { sort: { createdAt: -1, _id: -1 } });
@@ -91,5 +101,5 @@ export async function createStore(uri = process.env.MONGODB_URI, databaseName = 
     messages.createIndex({ conversationId: 1, createdAt: 1 }),
     plans.createIndex({ conversationId: 1, createdAt: -1 })
   ]);
-  return new MongoStore(client, messages, plans);
+  return new MongoStore(client, messages, plans, database.collection('quotes'));
 }

@@ -20,7 +20,7 @@ export class FoodAgent {
     this.conversation = conversation ?? (extractor ? undefined : new CatalogConversation());
   }
 
-  get dataSource() { return this.providers.some((provider) => provider.kind === 'live') ? 'provider-data' as const : 'verified-demo-data' as const; }
+  get dataSource() { return this.providers.some((provider) => provider.kind === 'live') ? 'provider-data' as const : this.providers.some((provider) => provider.kind === 'database') ? 'database-data' as const : 'verified-demo-data' as const; }
 
   async run(request: ChatRequest, previous?: ConversationContext | null) {
     const extraction = await this.extractor.extract(request, previous);

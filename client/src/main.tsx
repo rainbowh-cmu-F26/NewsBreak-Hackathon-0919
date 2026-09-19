@@ -8,14 +8,9 @@ import type { PlanRequest, PlanResponse } from './types';
 import './styles.css';
 import './interaction-styles.css';
 
-// Fixed UI preview only; no backend or database connection is required.
 const startingPlan: PlanResponse = {
-  summary: 'Two sample meals for previewing the comparison layout.',
-  options: [
-    { id: 'p1', restaurant: 'Little Hunan', item: 'Vegetable Chow Fun', price: 20, originalPrice: 20, fee: 2.99, eta: '25–35 min', badge: 'UI sample', detail: 'Illustrative menu item', tags: ['vegetarian'], available: true, verified: false, source: 'Frontend UI fixture', verifiedAt: '' },
-    { id: 'p4', restaurant: 'Green Garden', item: 'Tofu banh mi duo', price: 10, originalPrice: 10, fee: 1.99, eta: '20–30 min', badge: 'UI sample', detail: 'Illustrative menu set', tags: ['vegan', 'vegetarian'], available: true, verified: false, source: 'Frontend UI fixture', verifiedAt: '' },
-  ],
-  savings: 0, checkedAt: '2026-09-19T00:00:00.000Z', dataSource: 'verified-demo-data',
+  summary: 'Search or chat to load meals from the server.', options: [],
+  savings: 0, checkedAt: new Date().toISOString(), dataSource: 'database-data',
 };
 const apiBaseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8787';
 const quickSearches: Array<{ label: string } & PlanRequest> = [
@@ -98,11 +93,11 @@ function App() {
       </section>
       <div ref={chatRegion} id="mealwise-chat" hidden={!chatOpen}><ChatPanel budget={budget} dietary={dietary} onPlan={(response) => { setPlan(response.plan); setIsPreview(false); setShowSavedOnly(false); }} /></div>
       <section className="results" id="shortlist" aria-busy={loading}>
-        <div className="results-header"><div><p className="section-kicker">02 / Compare delivery prices</p><h2>{showSavedOnly ? 'Saved meal comparisons' : 'Same meal. Compare the total.'}</h2></div><span className="demo-label">DEMO · SAMPLE PRICES</span></div>
+        <div className="results-header"><div><p className="section-kicker">02 / Compare delivery prices</p><h2>{showSavedOnly ? 'Saved meal comparisons' : 'Same meal. Compare the total.'}</h2></div><span className="demo-label">STORED CATALOG · ESTIMATED PRICES</span></div>
         <p className="comparison-note">Compare one listed meal or set across two platforms. All quotes below are illustrative, not live platform prices. Personal coupons, memberships, and tips are not included. These quotes may exceed your budget.</p>
-        <div className="preview-toolbar"><span>{isPreview ? 'UI preview: two fixed sample meals. Search and chat require the backend.' : 'Meals returned by the demo planner; platform quotes are still UI samples.'}</span><button type="button" className="text-button" disabled={loading} onClick={() => { setPlan(startingPlan); setIsPreview(true); setShowSavedOnly(false); setError(''); }}>Load sample comparisons <ArrowRight size={14} /></button></div>
+        <div className="preview-toolbar"><span>{isPreview ? 'Search or chat to load food records from the server.' : 'Search results and prices returned by the server. Database records may include simulated quotes.'}</span><button type="button" className="text-button" disabled={loading} onClick={() => { setPlan(startingPlan); setIsPreview(true); setShowSavedOnly(false); setError(''); }}>Clear results <ArrowRight size={14} /></button></div>
         {error && <div className="error-message" role="alert"><span>{error}</span><button onClick={() => void submit()}>Try again <ArrowRight size={14} /></button></div>}
-        {loading ? <div className="loading-grid" aria-label="Loading comparisons">{[1, 2, 3].map((item) => <div className="loading-card" key={item}><span /><span /><span /><span /></div>)}</div> : visibleOptions.length === 0 ? <div className="empty-state"><Utensils size={25} /><p>{showSavedOnly ? 'No saved meals in these results.' : plan === startingPlan ? 'Your meal comparisons will appear here.' : 'No meals returned by the demo planner.'}</p><span>{showSavedOnly ? 'Tap a heart to save a meal comparison.' : 'Try another meal or adjust your budget.'}</span>{showSavedOnly && <button className="text-button" onClick={() => setShowSavedOnly(false)}>Back to comparisons <ArrowRight size={14} /></button>}</div> : <div className="comparison-list">{visibleOptions.map((option) => <PlatformComparison key={option.id} option={option} budget={budget} saved={savedIds.includes(option.id)} onSave={() => toggleSaved(option.id)} />)}</div>}
+        {loading ? <div className="loading-grid" aria-label="Loading comparisons">{[1, 2, 3].map((item) => <div className="loading-card" key={item}><span /><span /><span /><span /></div>)}</div> : visibleOptions.length === 0 ? <div className="empty-state"><Utensils size={25} /><p>{showSavedOnly ? 'No saved meals in these results.' : plan === startingPlan ? 'Your meal comparisons will appear here.' : 'No stored meals match your current filters.'}</p><span>{showSavedOnly ? 'Tap a heart to save a meal comparison.' : 'Try another meal or adjust your budget.'}</span>{showSavedOnly && <button className="text-button" onClick={() => setShowSavedOnly(false)}>Back to comparisons <ArrowRight size={14} /></button>}</div> : <div className="comparison-list">{visibleOptions.map((option) => <PlatformComparison key={option.id} option={option} budget={budget} saved={savedIds.includes(option.id)} onSave={() => toggleSaved(option.id)} />)}</div>}
       </section>
     </main><footer><span>mealwise / a Mountain View delivery guide</span><span>Built for everyday budgets <span className="footer-dot">•</span> <a href={`${apiBaseUrl}/health`}>System status</a></span></footer>
     {toast && <div className="toast" role="status"><Check size={16} /> {toast}</div>}

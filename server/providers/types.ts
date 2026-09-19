@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { dietaryValues, dealValues, providerValues, type FoodIntent } from '../../shared/intent.js';
+import { quoteSchema } from '../../shared/quotes.js';
 
 export const catalogOfferSchema = z.object({
   id: z.string().min(1), provider: z.enum(providerValues), restaurant: z.string().min(1), item: z.string().min(1),
@@ -12,6 +13,7 @@ export const catalogOfferSchema = z.object({
   deals: z.array(z.enum(dealValues)), minimumOrder: z.number().finite().nonnegative(), newCustomerOnly: z.boolean(),
   available: z.boolean(), location: z.string(), description: z.string(),
   checkedAt: z.string().datetime(), expiresAt: z.string().datetime(),
+  storedQuote: quoteSchema.optional(),
 }).strict().refine((offer) => offer.originalPrice >= offer.price && Date.parse(offer.expiresAt) > Date.parse(offer.checkedAt), 'Invalid price or freshness interval')
   .refine((offer) => !offer.deals.includes('free-delivery') || offer.deliveryFee === 0, 'Free delivery must have zero delivery fee')
   .refine((offer) => !offer.deals.includes('discount') || offer.price < offer.originalPrice, 'Discount must reduce the food price')
@@ -23,6 +25,6 @@ export type CatalogOffer = z.infer<typeof catalogOfferSchema>;
  */
 export interface OfferProvider {
   readonly id: string;
-  readonly kind: 'mock' | 'live';
+  readonly kind: 'mock' | 'live' | 'database';
   search(intent: FoodIntent, signal: AbortSignal): Promise<unknown[]>;
 }

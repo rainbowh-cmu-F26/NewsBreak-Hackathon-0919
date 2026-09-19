@@ -32,6 +32,9 @@ export const deliveryOptionSchema = z.object({
   serviceFee: z.number().nonnegative().optional(),
   savings: z.number().nonnegative().optional(),
   priceNote: z.string().optional(),
+  sourceUrl: z.string().nullable().optional(),
+  quote: z.object({ dataType: z.enum(['menu_only', 'synthetic', 'checkout_snapshot']), subtotal: z.number().nullable(), delivery: z.number().nullable(), service: z.number().nullable(), tax: z.number().nullable(), tip: z.number().nullable(), discount: z.number().nullable(), total: z.number().nullable() }).optional(),
+  comparisons: z.array(z.object({ platform: z.string(), subtotal: z.number(), delivery: z.number(), service: z.number(), tax: z.number(), tip: z.number(), discount: z.number(), total: z.number() })).optional(),
 });
 
 export type DeliveryOption = z.infer<typeof deliveryOptionSchema>;
@@ -40,7 +43,7 @@ export const planResponseSchema = z.object({
   options: z.array(deliveryOptionSchema),
   savings: z.number().nonnegative(),
   checkedAt: z.string().datetime(),
-  dataSource: z.enum(['verified-demo-data', 'provider-data']),
+  dataSource: z.enum(['verified-demo-data', 'provider-data', 'database-data']),
   agent: agentDetailsSchema.optional(),
 });
 export type PlanResponse = z.infer<typeof planResponseSchema>;

@@ -59,9 +59,19 @@ Budget is for the entire group. “$10 per person for two” becomes $20. Explic
 
 The local parser supports common English phrases and a finite vocabulary. It is not equivalent to model interpretation; unfamiliar wording may need rephrasing. Numeric budgets are supported, while some word-only budgets prompt for digits. Medical diet claims require clarification. A demo result is not an allergy-safety guarantee.
 
+## MongoDB food catalog
+
+When `MONGODB_URI` is configured, application startup wires both chat and planner searches to `mealwise.quotes` (or `MONGODB_DATABASE`). Each search reads the collection again; local JSON food fixtures are not used as a fallback for empty results, invalid records, or database failures. Without MongoDB, development mode retains the local demo catalog.
+
+The database uses the `shared/quotes.ts` schema imported from main. `DatabaseOfferProvider` validates these records and adapts them to the agent. Complete stored totals are used exactly once, including their recorded fees, tax, tips and discounts. Single-item menu-only records receive explicitly labeled demo delivery estimates using the existing simulation assumptions; they are not presented as real checkout quotes. Stale checkout snapshots, unavailable records, unknown platforms, membership-dependent offers and unconfirmed applied discounts are rejected. Synthetic records remain labeled as simulated even though they come from MongoDB.
+
+The adapter derives cuisine/food search hints from restaurant and item names; these are approximate and should eventually be replaced with explicit catalog tags. It does not infer dietary or allergy safety: missing ingredient/allergen completeness excludes restricted searches. Stored order quantities do not establish how many people a meal feeds, so group pricing is unavailable rather than multiplying a checkout quote. The shortlist shows one option per restaurant and includes comparable qualifying platform totals when order conditions match.
+
+API responses identify `dataSource: database-data`, and the UI renders the returned quote breakdown instead of hard-coded platform prices. Local files remain only as offline test/import fixtures. Use `new FoodAgent(undefined, [new DatabaseOfferProvider(store.listQuotes.bind(store))])` for explicit database-agent construction, or simply `createApp(store)` with the MongoDB store.
+
 ## Fake database and pricing
 
-`server/data/offers.json` is the mock database. It has 13 offer records across cuisines and simulated Uber Eats, DoorDash, and Grubhub labels, including an unavailable fixture. These records are not actual provider data or restaurant claims.
+`server/data/offers.json` is the offline development/test mock database, used only when no database catalog provider is configured. It has 13 offer records across cuisines and simulated Uber Eats, DoorDash, and Grubhub labels, including an unavailable fixture. These records are not actual provider data or restaurant claims.
 
 Records describe dietary tags, complete ingredient/allergen metadata, cross-contact, deal types, serving counts, discounted price, delivery/service fees, tax rate, ETA, minimum subtotal, eligibility, location, and availability. `MockOfferProvider` produces a five-minute simulated quote from each record. The timestamp describes a mock quote generation, not a real-world check.
 

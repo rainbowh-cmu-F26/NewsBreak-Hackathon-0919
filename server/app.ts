@@ -7,8 +7,9 @@ import { rateLimit, securityHeaders } from './middleware/security.js';
 import { createChatRouter } from './routes/chat.js';
 import { createPlanRouter } from './routes/plan.js';
 import { FoodAgent } from './agent/foodAgent.js';
+import { DatabaseOfferProvider } from './providers/database.js';
 
-export function createApp(store: MealWiseStore, agent = new FoodAgent()) {
+export function createApp(store: MealWiseStore, agent = new FoodAgent(undefined, store.listQuotes ? [new DatabaseOfferProvider(store.listQuotes.bind(store))] : undefined)) {
 	const app = express();
 	const isProduction = process.env.NODE_ENV === 'production';
 	const allowedOrigins = (process.env.CORS_ORIGIN || '').split(',').map((origin) => origin.trim()).filter(Boolean);

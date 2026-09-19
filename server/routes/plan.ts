@@ -1,9 +1,20 @@
 import { Router } from 'express';
+import { readFileSync } from 'node:fs';
+import { quoteSchema } from '../../shared/quotes.js';
+import { buildPlan } from '../agent/localAgent.js';
 import { planRequestSchema } from '../../shared/schemas.js';
 import { FoodAgent } from '../agent/foodAgent.js';
 
 export function createPlanRouter(agent = new FoodAgent()) {
   const planRouter = Router();
+  // Homepage browsing uses the existing demo catalog without AI interpretation.
+  planRouter.post('/defaults', (_request, response, next) => {
+    try {
+      const quotes = ['three-platform-demo.json', 'bogo-demo-quotes.json'].flatMap(file =>
+        quoteSchema.array().parse(JSON.parse(readFileSync(new URL(`../data/${file}`, import.meta.url), 'utf8'))));
+      return response.json(buildPlan({ prompt: 'All restaurants', budget: 35, dietary: 'No preference', mode: 'simulation' }, quotes));
+    } catch (error) { return next(error); }
+  });
   planRouter.post('/', async (request, response, next) => {
     const parsed = planRequestSchema.safeParse(request.body);
     if (!parsed.success) {

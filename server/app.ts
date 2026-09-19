@@ -8,6 +8,7 @@ import { createChatRouter } from './routes/chat.js';
 import { createPlanRouter } from './routes/plan.js';
 import { FoodAgent } from './agent/foodAgent.js';
 import { DatabaseOfferProvider } from './providers/database.js';
+import { createCatalogRouter } from './routes/catalog.js';
 
 export function createApp(store: MealWiseStore, agent = new FoodAgent(undefined, store.listQuotes ? [new DatabaseOfferProvider(store.listQuotes.bind(store))] : undefined)) {
 	const app = express();
@@ -32,6 +33,7 @@ export function createApp(store: MealWiseStore, agent = new FoodAgent(undefined,
 	});
 	app.get('/health', (_request, response) => response.json({ ok: true, service: 'mealwise-api', dataSource: agent.dataSource }));
 	app.use('/api/plan', createPlanRouter(agent));
+	app.use('/api/catalog', createCatalogRouter(store));
 	app.use('/api/chat', createChatRouter(store, agent));
 	app.use((_request, response) => response.status(404).json({ error: 'Route not found.' }));
 	app.use((error: unknown, _request: express.Request, response: express.Response, _next: express.NextFunction) => {

@@ -11,6 +11,7 @@ export type PlanRequest = z.infer<typeof planRequestSchema>;
 export const deliveryOptionSchema = z.object({
   id: z.string(),
   restaurant: z.string(),
+  restaurant_id: z.string().optional(),
   item: z.string(),
   price: z.number().nonnegative(),
   originalPrice: z.number().nonnegative(),

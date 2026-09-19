@@ -1,1 +1,1 @@
-{"root":["./src/main.tsx","./src/vite-env.d.ts","./src/api/chat.ts","./src/api/plan.ts","./src/components/chatpanel.tsx","./src/types/index.ts"],"version":"5.9.3"}
+{"root":["./src/main.tsx","./src/vite-env.d.ts","./src/api/chat.ts","./src/api/plan.ts","./src/components/chatpanel.tsx","./src/data/foodphotos.ts","./src/types/index.ts"],"version":"5.9.3"}

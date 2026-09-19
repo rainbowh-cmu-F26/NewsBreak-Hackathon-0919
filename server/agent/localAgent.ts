@@ -38,7 +38,8 @@ export function buildPlan(request: PlanRequest, quotes: Quote[] = demoQuotes()):
       id: `${q.restaurant.restaurant_id}-${q.comparison_key}-${q.platform}`,
       comparisons: simulation && scenarios.length ? scenarios.filter(other => other.restaurant.restaurant_id === q.restaurant.restaurant_id && other.comparison_key === q.comparison_key)
         .sort((a,b) => a.displayed_total_cents! - b.displayed_total_cents!).map(other => ({ platform: other.platform, subtotal: other.subtotal_cents!, delivery: other.delivery_fee_cents!, service: other.service_fee_cents!, tax: other.tax_cents!, tip: other.tip_cents!, discount: other.additional_discount_cents!, total: other.displayed_total_cents!, eta: `${other.eta_min_minutes}–${other.eta_max_minutes} min` })) : undefined,
-      restaurant: q.restaurant.name,
+      restaurant_id: q.restaurant.restaurant_id,
+      restaurant: q.restaurant.name.replace(/\s*\(Demo\)\s*$/i, "").trim(),
       item: q.platform_items.map(x => `${x.quantity} × ${x.item_name} (${x.size || 'size unspecified'})`).join(', '),
       price: amount(q)! / 100, originalPrice: amount(q)! / 100, fee: 0,
       eta: q.eta_min_minutes !== null && q.eta_max_minutes !== null ? `${q.eta_min_minutes}–${q.eta_max_minutes} min` : 'ETA unknown',

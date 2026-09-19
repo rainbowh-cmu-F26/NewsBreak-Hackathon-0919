@@ -4,11 +4,11 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch app.ts",
-    "start": "tsx app.ts",
+    "dev": "tsx watch --env-file=../.env app.ts",
+    "start": "tsx --env-file=../.env app.ts",
     "test": "node scripts/run-tests.mjs",
     "test:coverage": "node scripts/run-tests.mjs --experimental-test-coverage",
-    "seed:quotes": "tsx scripts/seed-quotes.ts"
+    "seed:quotes": "tsx --env-file=../.env scripts/seed-quotes.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",

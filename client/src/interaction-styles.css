@@ -28,3 +28,6 @@
 .photo-disclosure{font-size:11px;color:#7b8c86;line-height:1.5;margin-top:12px}
 @media(max-width:750px){.food-photo{height:210px}.offer-dialog{padding:22px;max-height:92vh}.food-photo-large{height:230px;margin:-22px -22px 20px;width:calc(100% + 44px)}.dialog-close{margin-top:-230px}}
 @media(prefers-reduced-motion:reduce){.food-photo img{transition:none}.restaurant-cover:hover img{transform:none}}
+
+.price-methodology { margin: 16px 0; color: #536b65; font-size: 14px; }
+.price-methodology summary { cursor: pointer; padding: 8px 0; font-weight: 600; }

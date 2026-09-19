@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { sourceOfferSchema } from './quotes.js';
 
 export const planRequestSchema = z.object({
   mode: z.enum(['checkout', 'menu', 'simulation']).optional(),
@@ -12,6 +13,7 @@ export const deliveryOptionSchema = z.object({
   id: z.string(),
   restaurant: z.string(),
   restaurant_id: z.string().optional(),
+  sourceOffer: sourceOfferSchema.optional(),
   item: z.string(),
   price: z.number().nonnegative(),
   originalPrice: z.number().nonnegative(),

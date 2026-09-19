@@ -34,11 +34,12 @@ export function buildPlan(request: PlanRequest, quotes: Quote[] = demoQuotes()):
   }
   const options: DeliveryOption[] = [...restaurants.values()]
     .sort((a, b) => amount(a)! - amount(b)! || a.restaurant.name.localeCompare(b.restaurant.name))
-    .slice(0, 15).map((q) => ({
+    .map((q) => ({
       id: `${q.restaurant.restaurant_id}-${q.comparison_key}-${q.platform}`,
       comparisons: simulation && scenarios.length ? scenarios.filter(other => other.restaurant.restaurant_id === q.restaurant.restaurant_id && other.comparison_key === q.comparison_key)
         .sort((a,b) => a.displayed_total_cents! - b.displayed_total_cents!).map(other => ({ platform: other.platform, subtotal: other.subtotal_cents!, delivery: other.delivery_fee_cents!, service: other.service_fee_cents!, tax: other.tax_cents!, tip: other.tip_cents!, discount: other.additional_discount_cents!, total: other.displayed_total_cents!, eta: `${other.eta_min_minutes}–${other.eta_max_minutes} min` })) : undefined,
       restaurant_id: q.restaurant.restaurant_id,
+      sourceOffer: q.source_offer,
       restaurant: q.restaurant.name.replace(/\s*\(Demo\)\s*$/i, "").trim(),
       item: q.platform_items.map(x => `${x.quantity} × ${x.item_name} (${x.size || 'size unspecified'})`).join(', '),
       price: amount(q)! / 100, originalPrice: amount(q)! / 100, fee: 0,
@@ -51,5 +52,5 @@ export function buildPlan(request: PlanRequest, quotes: Quote[] = demoQuotes()):
         subtotal: menu ? amount(q) : q.subtotal_cents, delivery: q.delivery_fee_cents, service: q.service_fee_cents, tax: q.tax_cents,
         combined: q.tax_and_fees_combined_cents, other: q.other_fees, tip: q.tip_cents, discount: q.additional_discount_cents }
     }));
-  return { summary: simulation ? (options.length ? `Found ${options.length} restaurants with a best matching demo option under $${request.budget.toFixed(2)}. Three simulated delivery options per restaurant. Four restaurants use sourced menu references; eleven restaurants are fictional. No live prices or delivery availability.` : 'No matching demo totals within this budget. Try a higher budget with No preference.') : menu ? (options.length ? `Found ${options.length} restaurants with a best matching menu item at or below $${request.budget.toFixed(2)} before fees. These are cached menu prices, not live checkout totals.` : 'No matching menu items. Try Panda, rice, chicken or paneer with No preference; dietary suitability is not verified.') : options.length ? `Found ${options.length} restaurants with a best matching recorded option within $${request.budget.toFixed(2)}. Prices apply only to the recorded account and location; confirm at checkout.` : 'No complete recorded quotes match this budget and dietary preference.', options, savings: 0, checkedAt: new Date().toISOString(), dataSource: 'quote-snapshots' };
+  return { summary: simulation ? (options.length ? `Found ${options.length} restaurants with a best matching demo option under $${request.budget.toFixed(2)}. Simulated platform comparisons per restaurant. Four restaurants use sourced menu references; the remaining restaurant scenarios are fictional. No live prices or delivery availability.` : 'No matching demo totals within this budget. Try a higher budget with No preference.') : menu ? (options.length ? `Found ${options.length} restaurants with a best matching menu item at or below $${request.budget.toFixed(2)} before fees. These are cached menu prices, not live checkout totals.` : 'No matching menu items. Try Panda, rice, chicken or paneer with No preference; dietary suitability is not verified.') : options.length ? `Found ${options.length} restaurants with a best matching recorded option within $${request.budget.toFixed(2)}. Prices apply only to the recorded account and location; confirm at checkout.` : 'No complete recorded quotes match this budget and dietary preference.', options, savings: 0, checkedAt: new Date().toISOString(), dataSource: 'quote-snapshots' };
 }

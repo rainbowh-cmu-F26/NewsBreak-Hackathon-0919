@@ -38,7 +38,7 @@ class MemoryStore implements MealWiseStore {
   }
 
   async listQuotes() {
-    return ['quotes.json', 'ubereats-menu-mountain-view.json', 'three-platform-demo.json'].flatMap(file => quoteSchema.array().parse(JSON.parse(readFileSync(new URL(`../data/${file}`, import.meta.url), 'utf8'))));
+    return ['quotes.json', 'ubereats-menu-mountain-view.json', 'three-platform-demo.json', 'bogo-demo-quotes.json'].flatMap(file => quoteSchema.array().parse(JSON.parse(readFileSync(new URL(`../data/${file}`, import.meta.url), 'utf8'))));
   }
 
   async close() {}

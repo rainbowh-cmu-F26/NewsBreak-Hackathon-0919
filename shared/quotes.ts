@@ -1,6 +1,15 @@
 import { z } from 'zod';
 const money = z.number().int().nonnegative().nullable();
+export const sourceOfferSchema = z.object({
+  id: z.string(), provider: z.string(), restaurant: z.string(), item: z.string(), cuisine: z.string(),
+  foods: z.array(z.string()), dietary: z.array(z.string()), ingredients: z.array(z.string()),
+  allergens: z.array(z.string()), mayContain: z.array(z.string()), ingredientInfoComplete: z.boolean(), allergyInfoComplete: z.boolean(),
+  price: z.number().nonnegative(), originalPrice: z.number().nonnegative(), deliveryFee: z.number().nonnegative(), serviceFee: z.number().nonnegative(),
+  taxRate: z.number().min(0).max(1), servings: z.number().int().positive(), etaMinutes: z.number().int().nonnegative(),
+  deals: z.array(z.string()), minimumOrder: z.number().nonnegative(), newCustomerOnly: z.boolean(), available: z.boolean(), location: z.string(), description: z.string()
+});
 export const quoteSchema = z.object({
+  source_offer: sourceOfferSchema.optional(),
   comparison_key: z.string().min(1),
   restaurant: z.object({ restaurant_id: z.string(), name: z.string(), address: z.string().nullable(), city: z.string(), state: z.string() }),
   location_id: z.string().nullable(),

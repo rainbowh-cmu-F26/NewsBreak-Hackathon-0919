@@ -1,6 +1,6 @@
 # MealWise
 
-MealWise is a delivery savings agent for low-income residents in Mountain View. It interprets food requests, remembers follow-up preferences, and filters a simulated delivery catalog by diet, cuisine, budget, servings, deal type, provider, and ETA. Optional OpenAI interpretation is available; no live delivery providers are connected yet.
+MealWise is a delivery savings agent for low-income residents in Mountain View. It interprets food requests, remembers follow-up preferences, and filters a simulated delivery catalog by diet, cuisine, budget, servings, deal type, provider, and ETA. Gemini and OpenAI interpretation are available; no live delivery providers are connected yet.
 
 ## Project structure
 
@@ -77,7 +77,7 @@ Returns API availability and the active data source. The current response identi
 
 The response contains a ranked `options` list, total `savings`, a plain-language `summary`, a `checkedAt` timestamp, and `dataSource`. Each option includes its total price inputs, ETA, promotion detail, verification status, source, and verification timestamp. Requests are rejected with a useful `400` response when the craving, budget, or dietary preference is invalid.
 
-The agent uses OpenAI structured intent extraction when `OPENAI_API_KEY` is configured, with a limited offline parser otherwise. Both paths use deterministic filtering and group quote calculations over the mock database. Set `AGENT_MODE=model` to require AI, or `local` to force offline operation. The UI shows the interpreted filters and active mode. See [the food agent guide](docs/food-agent.md) for setup, examples, limitations, and how to add authorized provider adapters.
+The agent supports Gemini (`AI_PROVIDER=gemini`, `GEMINI_API_KEY`, `GEMINI_MODEL=gemini-3.5-flash-lite`) and OpenAI (`AI_PROVIDER=openai`, `OPENAI_API_KEY`) structured intent extraction. Auto mode uses the local parser if the selected provider has no key. Both paths use deterministic filtering and group quote calculations over the mock database. Set `AGENT_MODE=model` to require AI, or `local` to force offline operation. The UI shows the interpreted filters and active mode. See [the food agent guide](docs/food-agent.md) for setup, examples, limitations, and how to add authorized provider adapters.
 
 `POST /api/chat`
 

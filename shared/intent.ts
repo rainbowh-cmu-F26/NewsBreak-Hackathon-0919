@@ -30,7 +30,7 @@ export const extractionSchema = z.object({
 
 export const agentDetailsSchema = z.object({
   intent: intentSchema,
-  mode: z.enum(['model', 'local']),
+  mode: z.enum(['model', 'local', 'unavailable']),
   clarification: z.string().nullable(),
   warnings: z.array(z.string()),
   appliedFilters: z.array(z.string()),

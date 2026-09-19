@@ -3,7 +3,7 @@
 The HTTP planner and chat endpoints use the same `FoodAgent` workflow:
 
 1. Load the conversation's saved intent (chat only).
-2. Interpret the latest message with OpenAI structured output, or a limited offline parser.
+2. Interpret the latest message with Gemini or OpenAI structured output, or a limited offline parser.
 3. Ask for clarification if interpretation is uncertain or unavailable.
 4. Search registered offer providers.
 5. Validate every returned record, enforce constraints in code, calculate a group quote, and rank eligible offers.
@@ -18,14 +18,17 @@ Use Node.js 22 or newer. From the repository root, copy `.env.example` to `.env`
 For AI interpretation, set:
 
 ```dotenv
-AGENT_MODE=auto
-OPENAI_API_KEY=your-server-side-key
-OPENAI_MODEL=gpt-4o-mini
+AGENT_MODE=model
+AI_PROVIDER=gemini
+GEMINI_API_KEY=your-server-side-key
+GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
-`auto` uses the model when a key is configured and otherwise uses the local parser. `local` always uses the offline parser. `model` requires a key and returns an unavailable response when it is missing. The UI labels which interpreter produced the result. Never put the key in a `VITE_` variable.
+`AI_PROVIDER=gemini` uses the Gemini GenerateContent API with JSON Schema output. To use OpenAI instead, set `AI_PROVIDER=openai`, `OPENAI_API_KEY`, and `OPENAI_MODEL` (default `gpt-4o-mini`). The default provider when AI_PROVIDER is omitted is OpenAI for backward compatibility.
 
-The integration uses the [Responses API with structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs), validates the result with Zod, sets `store: false`, and has a 12-second deadline. Only the current message, saved structured intent, form defaults, and previous best total are sent. Refusals, incomplete responses, invalid output, timeouts, and API errors return no recommendations rather than guessing. Tests inject model responses and never make paid model calls.
+`auto` uses the selected provider when its key is configured and otherwise uses the local parser. `local` always uses the offline parser. `model` requires a key and returns an unavailable response when it is missing. The UI labels which interpreter produced the result. Never put the key in a `VITE_` variable.
+
+The OpenAI integration uses the [Responses API with structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs), validates the result with Zod, sets `store: false`, and has a 12-second deadline. Only the current message, saved structured intent, form defaults, and previous best total are sent. Refusals, incomplete responses, invalid output, timeouts, and API errors return no recommendations rather than guessing. The Gemini adapter uses [GenerateContent](https://ai.google.dev/api/generate-content), the same intent schema and 12-second deadline, and sends the key only in the `x-goog-api-key` header. Its model output is validated before catalog search. Tests inject model responses and never make paid model calls.
 
 ## Try these requests
 
@@ -67,4 +70,4 @@ Conversation IDs act as session identifiers in this demo. Before a multi-user pr
 
 ## Validation
 
-`npm run test:coverage --workspace server` exercises extraction, follow-ups, provider validation, quote math, allergies, HTTP persistence, and mocked model success/failure responses. `npx tsc --noEmit -p server/tsconfig.json` checks the server; `npm run build` checks and bundles the client. Real OpenAI and MongoDB connectivity require separately configured credentials/services and are not covered by the offline suite.
+`npm run test:coverage --workspace server` exercises extraction, follow-ups, provider validation, quote math, allergies, HTTP persistence, and mocked model success/failure responses. `npx tsc --noEmit -p server/tsconfig.json` checks the server; `npm run build` checks and bundles the client. Real Gemini, OpenAI, and MongoDB connectivity require separately configured credentials/services and are not covered by the offline suite.

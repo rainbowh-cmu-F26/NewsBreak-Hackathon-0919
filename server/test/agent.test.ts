@@ -249,3 +249,95 @@ test('model outages preserve the last good conversational state', async () => {
   assert.deepEqual(second.context, first.context);
   assert.equal(second.plan.options.length, 0);
 });
+
+test('model errors distinguish billing, authentication, rate limits and model access without exposing upstream messages', async () => {
+  const cases = [
+    { status: 429, code: 'credit_balance_exhausted', type: 'insufficient_quota', expected: /credits are exhausted/ },
+    { status: 429, code: 'project_spend_limit_exceeded', type: 'insufficient_quota', expected: /spending or usage limit/ },
+    { status: 429, code: 'insufficient_quota', type: 'insufficient_quota', expected: /quota is unavailable/ },
+    { status: 429, code: 'rate_limit_exceeded', type: 'rate_limit_error', expected: /rate-limiting/ },
+    { status: 401, code: 'invalid_api_key', type: 'authentication_error', expected: /rejected the API key/ },
+    { status: 404, code: 'model_not_found', type: 'invalid_request_error', expected: /cannot access the configured model/ },
+    { status: 400, code: 'invalid_json_schema', type: 'invalid_request_error', expected: /request configuration/ },
+    { status: 503, code: 'server_error', type: 'server_error', expected: /temporarily unavailable/ },
+  ];
+  for (const entry of cases) {
+    let calls = 0;
+    const extractor = new FoodIntentExtractor({ mode: 'model', apiKey: 'test-key', fetch: async () => {
+      calls++;
+      return new Response(JSON.stringify({ error: { code: entry.code, type: entry.type, message: 'PRIVATE_PROVIDER_DETAIL' } }), { status: entry.status });
+    } });
+    const result = await new FoodAgent(extractor).run(input('Vegan dinner'));
+    assert.match(result.reply, entry.expected);
+    assert.equal(result.plan.agent.mode, 'unavailable');
+    assert.equal(result.plan.options.length, 0);
+    assert.equal(calls, 1);
+    assert.ok(!JSON.stringify(result).includes('PRIVATE_PROVIDER_DETAIL'));
+    assert.ok(chatResponseSchema.safeParse({ conversationId: '00000000-0000-4000-8000-000000000000', reply: result.reply, plan: result.plan }).success);
+  }
+});
+
+test('model timeouts return an explicit bounded-wait message', async () => {
+  const extractor = new FoodIntentExtractor({ mode: 'model', apiKey: 'test-key', fetch: async (_url, init) => {
+    assert.ok(init?.signal);
+    throw new DOMException('Request timed out', 'TimeoutError');
+  } });
+  const result = await new FoodAgent(extractor).run(input('Dinner'));
+  assert.match(result.reply, /12-second time limit/);
+  assert.equal(result.plan.options.length, 0);
+});
+
+test('Gemini uses the selected model and header authentication with structured intent output', async () => {
+  const intent = extractLocal(input('Vegan Mexican BOGO for two under $20')).intent;
+  const extractor = new FoodIntentExtractor({ provider: 'gemini', mode: 'model', apiKey: 'gemini-test-key', model: 'gemini-3.5-flash-lite', fetch: async (url, init) => {
+    assert.equal(url, 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent');
+    assert.ok(!String(url).includes('gemini-test-key'));
+    assert.equal(new Headers(init?.headers).get('x-goog-api-key'), 'gemini-test-key');
+    const body = JSON.parse(String(init?.body));
+    assert.equal(body.generationConfig.responseMimeType, 'application/json');
+    assert.equal(body.generationConfig.responseJsonSchema.type, 'object');
+    assert.ok(body.systemInstruction.parts[0].text);
+    assert.equal(JSON.parse(body.contents[0].parts[0].text).message, 'Vegan Mexican BOGO for two under $20');
+    return new Response(JSON.stringify({ candidates: [{ finishReason: 'STOP', content: { parts: [
+      { thought: true, text: 'Ignore this internal thought part' },
+      { text: JSON.stringify({ intent, clarification: null }) },
+    ] } }] }));
+  } });
+  const result = await new FoodAgent(extractor).run(input('Vegan Mexican BOGO for two under $20'));
+  assert.equal(result.plan.agent.mode, 'model');
+  assert.equal(result.plan.options[0].total, 12.49);
+});
+
+test('Gemini reports configuration and quota errors without leaking upstream details', async () => {
+  const cases = [
+    { status: 400, details: [{ reason: 'API_KEY_INVALID' }], expected: /rejected the API key/ },
+    { status: 400, details: [], expected: /request configuration/ },
+    { status: 401, details: [], expected: /rejected the API key/ },
+    { status: 403, details: [], expected: /denied access/ },
+    { status: 404, details: [], expected: /model is unavailable/ },
+    { status: 429, details: [], expected: /quota or rate limit/ },
+    { status: 503, details: [], expected: /temporarily unavailable/ },
+  ];
+  for (const entry of cases) {
+    const extractor = new FoodIntentExtractor({ provider: 'gemini', mode: 'model', apiKey: 'test-key', fetch: async () =>
+      new Response(JSON.stringify({ error: { details: entry.details, message: 'PRIVATE_GEMINI_DETAIL' } }), { status: entry.status }) });
+    const result = await new FoodAgent(extractor).run(input('Dinner'));
+    assert.match(result.reply, entry.expected);
+    assert.equal(result.plan.agent.mode, 'unavailable');
+    assert.equal(result.plan.options.length, 0);
+    assert.ok(!JSON.stringify(result).includes('PRIVATE_GEMINI_DETAIL'));
+  }
+});
+
+test('Gemini blocked, truncated and malformed responses never produce recommendations', async () => {
+  for (const body of [
+    { promptFeedback: { blockReason: 'SAFETY' } },
+    { candidates: [{ finishReason: 'MAX_TOKENS', content: { parts: [{ text: '{}' }] } }] },
+    { candidates: [{ finishReason: 'STOP', content: { parts: [{ text: '{broken' }] } }] },
+  ]) {
+    const extractor = new FoodIntentExtractor({ provider: 'gemini', mode: 'model', apiKey: 'test-key', fetch: async () => new Response(JSON.stringify(body)) });
+    const result = await new FoodAgent(extractor).run(input('Dinner'));
+    assert.equal(result.plan.options.length, 0);
+    assert.equal(result.plan.agent.mode, 'unavailable');
+  }
+});

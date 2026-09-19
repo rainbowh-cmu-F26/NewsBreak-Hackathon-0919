@@ -23,7 +23,7 @@ const result = spawnSync(process.execPath, [
   '--import', 'tsx', '--test', ...process.argv.slice(2), ...tests,
 ], {
   cwd: serverDirectory,
-  env: { ...process.env, NODE_ENV: 'test', AGENT_MODE: 'local' },
+  env: { ...process.env, NODE_ENV: 'test', AGENT_MODE: 'local', AI_PROVIDER: 'openai' },
   stdio: 'inherit',
 });
 

@@ -1,0 +1,9 @@
+{
+  "name": "delivery-agent-server",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": { "dev": "tsx watch app.ts", "start": "tsx app.ts" },
+  "dependencies": { "cors": "^2.8.5", "express": "^4.21.2", "zod": "^3.24.1" },
+  "devDependencies": { "@types/cors": "^2.8.17", "@types/express": "^5.0.0", "tsx": "^4.19.2", "typescript": "^5.7.2" }
+}

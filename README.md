@@ -2,6 +2,14 @@
 
 MealWise is a delivery savings agent for low-income residents in Mountain View. It interprets food requests, remembers follow-up preferences, and filters a simulated delivery catalog by diet, cuisine, budget, servings, deal type, provider, and ETA. Gemini and OpenAI interpretation are available; no live delivery providers are connected yet.
 
+## Team members
+
+- Chenyi Zhao
+- Victoria Zhu
+- Jingyi Ding
+- Susie Zhong
+- Rainbow He
+
 ## Live demo
 
 [Try MealWise](https://newsbreak-hackathon-0919.onrender.com/) — hosted on Render.
